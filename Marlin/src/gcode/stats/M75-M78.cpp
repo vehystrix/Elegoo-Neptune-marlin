@@ -21,6 +21,7 @@
  */
 
 #include "../gcode.h"
+#include "../../gcode/queue.h"
 #include "../../module/printcounter.h"
 #include "../../lcd/marlinui.h"
 #if ENABLED(HOST_PAUSE_M76)
@@ -28,6 +29,10 @@
 #endif
 
 #include "../../MarlinCore.h" // for startOrResumeJob
+
+  #include "../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+//Marlin\src\gcode\queue.h
+// Marlin\src\gcode\stats\M75-M78.cpp
 
 #if ENABLED(DWIN_LCD_PROUI)
   #include "../../lcd/e3v2/proui/dwin.h"
@@ -38,6 +43,19 @@
  */
 void GcodeSuite::M75() {
   startOrResumeJob();
+
+    //DWIN_Print_Started(false);
+    //if (!IS_SD_PRINTING()) DWIN_Print_Header(parser.string_arg && parser.string_arg[0] ? parser.string_arg : GET_TEXT(MSG_HOST_START_PRINT));
+  #if ENABLED(TJC_AVAILABLE)
+    LCD_SERIAL_2.printf("page printpause"); 
+    LCD_SERIAL_2.printf("\xff\xff\xff");  
+    restFlag1 = 0;
+    LCD_SERIAL_2.printf("restFlag1=0");  //9999----打印界面显示：1-恢复按钮 0-暂停按钮
+    LCD_SERIAL_2.printf("\xff\xff\xff");
+
+
+  #endif
+
   #if ENABLED(DWIN_LCD_PROUI)
     DWIN_Print_Started(false);
     if (!IS_SD_PRINTING()) DWIN_Print_Header(parser.string_arg && parser.string_arg[0] ? parser.string_arg : GET_TEXT(MSG_HOST_START_PRINT));
@@ -48,6 +66,23 @@ void GcodeSuite::M75() {
  * M76: Pause print timer
  */
 void GcodeSuite::M76() {
+            restFlag1 = 1;//9999----打印界面显示：同时判断restFlag1 = 1  restFlag2 = 0      1-恢复按钮 0-暂停按钮
+            restFlag2 = 0;
+            LCD_SERIAL_2.printf("restFlag1=1");
+            LCD_SERIAL_2.printf("\xff\xff\xff");
+            LCD_SERIAL_2.printf("restFlag2=0");
+            LCD_SERIAL_2.printf("\xff\xff\xff");
+
+  #if ENABLED(TJC_AVAILABLE)
+        //TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_open(PROMPT_PAUSE_RESUME, F("Pause SD"), F("Resume")));
+        //hostui.pause();
+        //queue.enqueue_now_P(PSTR("M25"));
+        // queue.inject(F("M10088"));
+    // LCD_SERIAL_2.printf("page printpause"); 
+    // LCD_SERIAL_2.printf("restFlag1=0");  //9999----打印界面显示：1-恢复按钮 0-暂停按钮
+    // LCD_SERIAL_2.printf("\xff\xff\xff");
+  #endif
+
   print_job_timer.pause();
   TERN_(HOST_PAUSE_M76, hostui.pause());
   TERN_(DWIN_LCD_PROUI, DWIN_Print_Pause());
@@ -57,6 +92,18 @@ void GcodeSuite::M76() {
  * M77: Stop print timer
  */
 void GcodeSuite::M77() {
+
+
+  #if ENABLED(TJC_AVAILABLE) 
+    //DWIN_Print_Started(false);
+    //if (!IS_SD_PRINTING()) DWIN_Print_Header(parser.string_arg && parser.string_arg[0] ? parser.string_arg : GET_TEXT(MSG_HOST_START_PRINT));
+
+  LCD_SERIAL_2.printf("page main"); 
+  LCD_SERIAL_2.printf("\xff\xff\xff");  
+  
+  #endif
+
+
   print_job_timer.stop();
   TERN_(DWIN_LCD_PROUI, DWIN_Print_Finished());
 }

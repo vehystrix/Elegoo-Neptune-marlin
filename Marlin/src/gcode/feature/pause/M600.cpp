@@ -79,6 +79,8 @@ void GcodeSuite::M600() {
   #if ENABLED(TJC_AVAILABLE)
     
     RTS_M600_Flag = true;
+    LCD_SERIAL_2.printf("noFilamentPush.t0.txt=\"M600 Trigger\"");
+    LCD_SERIAL_2.printf("\xff\xff\xff");
 
   #else
 

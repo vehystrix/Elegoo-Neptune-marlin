@@ -323,7 +323,7 @@ void DGUSDisplay::ProcessRx() {
         if (command == DGUS_CMD_READVAR) 
         {
           #if ENABLED(RTS_AVAILABLE)
-            const uint8_t dlen = tmp[2] << 1;  // Convert to Bytes. (Display works with words)
+            const uint8_t dlen = (tmp[2] << 1);  // Convert to Bytes. (Display works with words)
             rtscheck.recdat.command = command;
             rtscheck.recdat.addr = ((tmp[0] << 8) | tmp[1]);
             rtscheck.recdat.len = tmp[2];

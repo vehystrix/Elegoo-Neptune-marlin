@@ -28,10 +28,10 @@
   #define FHONE   (0x5A)
   #define FHTWO   (0xA5)
   #define FHLENG  (0x06)
-  //#define TEXTBYTELEN     20
-  #define TEXTBYTELEN    40
-  //#define MaxFileNumber   20
-  #define MaxFileNumber   25
+
+  #define TEXTBYTELEN         40
+  //#define MaxFileNumber       25
+  #define MaxFileNumber       80
 
   #define FileNum             MaxFileNumber
   #define FileNameLen         TEXTBYTELEN
@@ -315,7 +315,9 @@
     SetPreNozzleTemp,
     SetPreBedTemp,
     HardwareTest,
-    Err_Control
+    Err_Control,
+    PrintFiles,
+    PrintConfirm
   };
 
   const unsigned long Addrbuf[] = 
@@ -357,7 +359,9 @@
     0x2200, //SetPreNozzleTemp
     0x2201, //SetPreBedTemp
     0x2202, //HardwareTest
-    0X2203, //Err_Control
+    0x2203, //Err_Control
+    0x2204, //Printfiles
+    0x2205, //PrintConfirm
     0
   };
 
@@ -387,17 +391,19 @@
   #define CORP_WEBSITE            "www.elegoo.com"
 
   #if NEPTUNE_3_PRO
-    #define SOFTVERSION             "1.1.5.1a"
+    #define SOFTVERSION             "1.1.5.1b"
   #elif NEPTUNE_3_PLUS
-    #define SOFTVERSION             "1.2.5.1a"
+    #define SOFTVERSION             "1.2.5.1b"
   #elif NEPTUNE_3_MAX
-    #define SOFTVERSION             "1.3.5.1a"
+    #define SOFTVERSION             "1.3.5.1b"
   #endif
 
   #if ENABLED(SDSUPPORT)
     #include "../../../../sd/SdFile.h"
     #include "../../../../sd/cardreader.h"
   #endif
+
+  void RTS_Pause_Api(void);
 
   class MediaFileReader {
     private:

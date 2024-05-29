@@ -531,6 +531,9 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 28: M28(); break;                                    // M28: Start SD write
         case 29: M29(); break;                                    // M29: Stop SD write
         case 30: M30(); break;                                    // M30 <filename> Delete File
+        #if ENABLED(TJC_AVAILABLE)
+          case 10088: M10088(); break;
+        #endif
 
         #if HAS_MEDIA_SUBCALLS
           case 32: M32(); break;                                  // M32: Select file and start SD print

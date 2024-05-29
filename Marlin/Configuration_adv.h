@@ -1506,9 +1506,9 @@
   #if NEPTUNE_3_PRO
     #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y230"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
   #elif NEPTUNE_3_PLUS
-    #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y330"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
+    #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y320"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
   #elif NEPTUNE_3_MAX
-    #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y430"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
+    #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y420"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
   #endif
 
   #if ENABLED(PRINTER_EVENT_LEDS)
