@@ -34,7 +34,7 @@
   #include "../queue.h"
 #endif
 
-#if EITHER(LCD_SET_PROGRESS_MANUALLY, SD_REPRINT_LAST_SELECTED_FILE)
+#if EITHER(SET_PROGRESS_MANUALLY, SD_REPRINT_LAST_SELECTED_FILE)
   #include "../../lcd/marlinui.h"
 #endif
 
@@ -90,7 +90,7 @@ void GcodeSuite::M1001() {
   process_subcommands_now(F("M77"));
 
   // Set the progress bar "done" state
-  TERN_(LCD_SET_PROGRESS_MANUALLY, ui.set_progress_done());
+  TERN_(SET_PROGRESS_PERCENT, ui.set_progress_done());
 
   // Announce SD file completion
   {
@@ -115,7 +115,6 @@ void GcodeSuite::M1001() {
   #endif
 
   TERN_(EXTENSIBLE_UI, ExtUI::onPrintDone());
-  TERN_(DWIN_LCD_PROUI, DWIN_Print_Finished());
 
   #if ENABLED(RTS_AVAILABLE)
 
