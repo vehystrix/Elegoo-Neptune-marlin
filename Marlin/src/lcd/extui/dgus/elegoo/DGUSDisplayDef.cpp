@@ -466,7 +466,7 @@
 
     if(CardReader::flag.mounted)
     {
-      uint16_t fileCnt = card.get_num_Files();
+      uint16_t fileCnt = card.get_num_items();
 
       card.getWorkDirName();
       if(card.filename[0] != '/')
