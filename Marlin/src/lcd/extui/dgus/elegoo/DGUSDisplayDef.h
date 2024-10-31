@@ -189,7 +189,7 @@
 
   extern celsius_t pla_extrusion_temp;
   extern celsius_t pla_bed_temp;
-    
+
   extern celsius_t petg_extrusion_temp;
   extern celsius_t petg_bed_temp;
 
@@ -206,12 +206,12 @@
   extern bool abortSD_flag;
   extern bool RTS_M600_Flag;
   extern bool Home_stop_flag;
-  extern bool Move_finish_flag; 
+  extern bool Move_finish_flag;
 
   extern uint8_t restFlag1;
   extern uint8_t restFlag2;
 
-  #define PIC_TXT_GOCDE     
+  #define PIC_TXT_GOCDE
 
   /************struct**************/
   typedef struct DataBuf
@@ -320,7 +320,7 @@
     PrintConfirm
   };
 
-  const unsigned long Addrbuf[] = 
+  const unsigned long Addrbuf[] =
   {
     0x1002, //MainPageKey
     0x1004, //AdjustmentKey
@@ -368,7 +368,7 @@
   extern void RTSUpdate();
   extern void RTSInit();
 
-  extern void RTS_reset_settings(void); 
+  extern void RTS_reset_settings(void);
 
   // extern uint8_t active_extruder_font;
   // extern uint8_t dualXPrintingModeStatus;
@@ -387,7 +387,7 @@
   void EachMomentUpdate();
 
   #define MACVERSION              STRING_CONFIG_H_AUTHOR
-  
+
   #define CORP_WEBSITE            "www.elegoo.com"
 
 /*
@@ -399,7 +399,7 @@
     #define SOFTVERSION             "1.3.5.1b"
   #endif
 */
-  #define SOFTVERSION             "2.1.2.3b"
+  #define SOFTVERSION             "2.1.2.4b"
 
   #if ENABLED(SDSUPPORT)
     #include "../../../../sd/SdFile.h"
