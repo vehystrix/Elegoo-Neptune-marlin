@@ -390,13 +390,7 @@
   
   #define CORP_WEBSITE            "www.elegoo.com"
 
-  #if NEPTUNE_3_PRO
-    #define SOFTVERSION             "1.1.5.1b"
-  #elif NEPTUNE_3_PLUS
-    #define SOFTVERSION             "1.2.5.1b"
-  #elif NEPTUNE_3_MAX
-    #define SOFTVERSION             "1.3.5.1b"
-  #endif
+  #define SOFTVERSION             "bugfix-2.1.x"
 
   #if ENABLED(SDSUPPORT)
     #include "../../../../sd/SdFile.h"
