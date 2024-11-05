@@ -1300,7 +1300,9 @@
 #if NEPTUNE_3_PRO
   #define DEFAULT_AXIS_STEPS_PER_UNIT   {80.00, 80.00, 400.00, 380.00}
 #elif NEPTUNE_3_PLUS
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   {80.00, 80.00, 400.00, 390.00}
+    // X feedrate was  80.00, recalibrated to  79.52
+    // E feedrate was 390.00, recalibrated to 424.83
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   {79.52, 80.00, 400.00, 424.83}
 #elif NEPTUNE_3_MAX
   #define DEFAULT_AXIS_STEPS_PER_UNIT   {80.20, 80.20, 400.00, 390.00}
 #endif
@@ -1942,8 +1944,8 @@
   #define Y_MAX_POS Y_BED_SIZE
   #define Z_MAX_POS 283
 #elif NEPTUNE_3_PLUS
-  #define X_MIN_POS -8.3
-  #define Y_MIN_POS -1.3
+  #define X_MIN_POS -10.3
+  #define Y_MIN_POS 0
   #define Z_MIN_POS 0
   #define X_MAX_POS X_BED_SIZE
   #define Y_MAX_POS Y_BED_SIZE
