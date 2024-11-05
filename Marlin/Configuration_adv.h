@@ -2772,7 +2772,7 @@
  *   'M106 P<fan> T2'     : Use the set secondary speed
  *   'M106 P<fan> T1'     : Restore the previous fan speed
  */
-//#define EXTRA_FAN_SPEED
+#define EXTRA_FAN_SPEED
 
 // @section gcode
 
