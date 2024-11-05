@@ -1090,7 +1090,7 @@
       #define SHAPING_FREQ_X  48.485      // (Hz) The default dominant resonant frequency on the X axis.
       #define SHAPING_ZETA_X  0.15f       // Damping ratio of the X axis (range: 0.0 = no damping to 1.0 = critical damping).
     #elif NEPTUNE_3_PLUS  // Calibration from vehystrix
-      #define SHAPING_FREQ_X  45          // (Hz) The default dominant resonant frequency on the X axis.
+      #define SHAPING_FREQ_X  36          // (Hz) The default dominant resonant frequency on the X axis.
       #define SHAPING_ZETA_X  0.15f       // Damping ratio of the X axis (range: 0.0 = no damping to 1.0 = critical damping).
     #elif NEPTUNE_3_MAX
       #define SHAPING_FREQ_X  40          // (Hz) The default dominant resonant frequency on the X axis.
@@ -1105,8 +1105,8 @@
       #define SHAPING_FREQ_Y  51.82       // (Hz) The default dominant resonant frequency on the Y axis.
       #define SHAPING_ZETA_Y  0.15f       // Damping ratio of the Y axis (range: 0.0 = no damping to 1.0 = critical damping).
     #elif NEPTUNE_3_PLUS  // Calibration from vehystrix
-      #define SHAPING_FREQ_Y  21.25       // (Hz) The default dominant resonant frequency on the Y axis.
-      #define SHAPING_ZETA_Y  0.15f       // Damping ratio of the Y axis (range: 0.0 = no damping to 1.0 = critical damping).
+      #define SHAPING_FREQ_Y  29.5        // (Hz) The default dominant resonant frequency on the Y axis.
+      #define SHAPING_ZETA_Y  0.1f       // Damping ratio of the Y axis (range: 0.0 = no damping to 1.0 = critical damping).
     #elif NEPTUNE_3_MAX
       #define SHAPING_FREQ_Y  40          // (Hz) The default dominant resonant frequency on the Y axis.
       #define SHAPING_ZETA_Y  0.15f       // Damping ratio of the Y axis (range: 0.0 = no damping to 1.0 = critical damping).
