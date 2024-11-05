@@ -462,7 +462,6 @@ G29_TYPE GcodeSuite::G29() {
             );
             gcode.process_subcommands_now(F("G28"));
           #else
-            #if ENABLED(RTS_AVAILABLE)
             probe.preheat_for_probing(LEVELING_NOZZLE_TEMP,
               TERN(EXTENSIBLE_UI, ExtUI::getLevelingBedTemp(), LEVELING_BED_TEMP)
             );
@@ -840,7 +839,12 @@ G29_TYPE GcodeSuite::G29() {
               rtscheck.RTS_SndData(abl.z_values[abl.meshCount.x][abl.meshCount.y]*1000, AUTO_BED_LEVEL_1POINT_VP + (showcount - 1) * 2);
               
               #if ENABLED(TJC_AVAILABLE)
-                #if ENABLED(NEPTUNE_3_PLUS)
+                #if ENABLED(NEPTUNE_3_PRO)
+                  char temp[32] = {0};
+                  sprintf(temp, "leveldata_36.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
+                  LCD_SERIAL.printf(temp);
+                  LCD_SERIAL.printf("\xff\xff\xff");
+                #elif ENABLED(NEPTUNE_3_PLUS)
                   char temp[32] = {0};
                   //sprintf(temp, "leveldata_49.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
                   sprintf(temp, "aux49_data.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
@@ -853,11 +857,6 @@ G29_TYPE GcodeSuite::G29() {
                   sprintf(temp, "aux63_data.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
                   LCD_SERIAL.printf(temp);
                   LCD_SERIAL.printf("\xff\xff\xff");                 
-                #elif ENABLED(NEPTUNE_3_PRO)
-                  char temp[32] = {0};
-                  sprintf(temp, "leveldata_36.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
-                  LCD_SERIAL.printf(temp);
-                  LCD_SERIAL.printf("\xff\xff\xff");
                 #endif
               #endif
 

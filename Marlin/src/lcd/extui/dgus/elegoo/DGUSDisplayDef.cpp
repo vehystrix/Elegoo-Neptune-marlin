@@ -64,8 +64,8 @@
   float zprobe_zoffset;
   float last_zoffset = 0.0;
 
-  //float manual_feedrate_mm_m[] = {50 * 60, 50 * 60, 4 * 60, 150};
-  float manual_feedrate_mm_m[] = {50 * 60, 50 * 60, 4 * 60, 150};
+  //float manual_feedrate_mm_m_[] = {50 * 60, 50 * 60, 4 * 60, 150};
+  float manual_feedrate_mm_m_[] = MANUAL_FEEDRATE;
 
   //bed_mesh_t z_values;
   uint8_t showcount = 0;
@@ -222,7 +222,7 @@
   {
     if (!planner.is_full())
     {
-      planner.buffer_line(current_position, MMM_TO_MMS(manual_feedrate_mm_m[(int8_t)axis]), active_extruder);
+      planner.buffer_line(current_position, MMM_TO_MMS(manual_feedrate_mm_m_[(int8_t)axis]), active_extruder);
     }
   }
 
@@ -466,7 +466,7 @@
 
     if(CardReader::flag.mounted)
     {
-      uint16_t fileCnt = card.get_num_Files();
+      uint16_t fileCnt = card.get_num_items();
 
       card.getWorkDirName();
       if(card.filename[0] != '/')
@@ -3620,7 +3620,7 @@
           {
             zprobe_zoffset = ((float)recdat.data[0]) / 100;
           }
-          if(WITHIN((zprobe_zoffset), Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX))
+          if(WITHIN((zprobe_zoffset), PROBE_OFFSET_ZMIN, PROBE_OFFSET_ZMAX))
           {
             babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);
           }
@@ -4911,13 +4911,13 @@
         #endif
 
         #if ENABLED(TJC_AVAILABLE)
-          manual_feedrate_mm_m[E_AXIS] = ( ((recdat.data[0] & 0xFF00) >> 8) | ((recdat.data[0] & 0x00FF)<<8));
+          manual_feedrate_mm_m_[E_AXIS] = ( ((recdat.data[0] & 0xFF00) >> 8) | ((recdat.data[0] & 0x00FF)<<8));
           memset(temp,0,sizeof(temp));
-          sprintf(temp, "prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m[E_AXIS]);
+          sprintf(temp, "prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m_[E_AXIS]);
           LCD_SERIAL.printf(temp);
           LCD_SERIAL.printf("\xff\xff\xff");         
         #else
-          manual_feedrate_mm_m[E_AXIS] = ((float)recdat.data[0] / 10);
+          manual_feedrate_mm_m_[E_AXIS] = ((float)recdat.data[0] / 10);
         #endif
       }
       break;
@@ -5289,7 +5289,7 @@
             LCD_SERIAL.printf("\xff\xff\xff");
 
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m[E_AXIS]);
+            sprintf(temp, "prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m_[E_AXIS]);
             LCD_SERIAL.printf(temp);
             LCD_SERIAL.printf("\xff\xff\xff");    
           #endif
@@ -5435,9 +5435,9 @@
         {
           #if ENABLED(BABYSTEPPING)
             last_zoffset = probe.offset.z;
-            //if (WITHIN((zprobe_zoffset + 0.1), Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX))
+            //if (WITHIN((zprobe_zoffset + 0.1), ZPROBE_OFFSET_ZMIN, PROBE_OFFSET_ZMAX))
             
-            if (WITHIN((probe.offset.z + zoffset_unit), Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX))
+            if (WITHIN((probe.offset.z + zoffset_unit), PROBE_OFFSET_ZMIN, PROBE_OFFSET_ZMAX))
             {
               #if ENABLED(HAS_LEVELING)
                 zprobe_zoffset = (probe.offset.z + zoffset_unit);
@@ -5467,7 +5467,7 @@
         {
           #if ENABLED(BABYSTEPPING)
             last_zoffset = probe.offset.z;
-            if (WITHIN((probe.offset.z - zoffset_unit), Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX))
+            if (WITHIN((probe.offset.z - zoffset_unit), PROBE_OFFSET_ZMIN, PROBE_OFFSET_ZMAX))
             {
               zprobe_zoffset = (probe.offset.z - zoffset_unit);
               babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);

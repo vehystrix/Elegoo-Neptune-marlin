@@ -80,9 +80,9 @@
 //
 // Auto fans
 //
-#define AUTO_FAN_PIN                        PB0    //FAN2
+#define FAN1_PIN                        PB0    //FAN2
 #ifndef E0_AUTO_FAN_PIN
-  #define E0_AUTO_FAN_PIN           AUTO_FAN_PIN
+  #define E0_AUTO_FAN_PIN           FAN1_PIN
 #endif
 
 //
@@ -90,7 +90,7 @@
 //
 #define HEATER_0_PIN                        PA6    // "HE"
 #define HEATER_BED_PIN                      PA5    // "HB"
-#define FAN_PIN                             PA7    // FAN1
+#define FAN0_PIN                             PA7    // FAN1
 
 //
 // Filament Runout Sensor

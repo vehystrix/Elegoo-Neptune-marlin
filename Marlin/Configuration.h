@@ -74,6 +74,8 @@
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_MKS_E3D_V2
   #if ENABLED(RTS_AVAILABLE)
+    #define NO_AUTO_ASSIGN_WARNING  // suppress warning for auto-assigning LCD serial port
+    
     //#define NEPTUNE_3_PRO      1
     #define NEPTUNE_3_PLUS   1
     //#define NEPTUNE_3_MAX    1

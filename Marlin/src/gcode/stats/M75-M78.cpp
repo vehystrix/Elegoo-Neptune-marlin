@@ -30,7 +30,7 @@
 #include "../../MarlinCore.h" // for startOrResumeJob
 
 #if ENABLED(TJC_AVAILABLE)
-  #include "../../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+  #include "../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
   #include "../../gcode/queue.h"
 #endif
 

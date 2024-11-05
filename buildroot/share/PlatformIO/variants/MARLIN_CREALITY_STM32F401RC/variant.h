@@ -86,11 +86,11 @@ extern "C" {
 #define NUM_ANALOG_INPUTS       16
 
 // SPI definitions
-// #define PIN_SPI_SS              PA4
-// #define PIN_SPI_SS1             PA4
-// #define PIN_SPI_MOSI            PA7
-// #define PIN_SPI_MISO            PA6
-// #define PIN_SPI_SCK             PA5
+#define PIN_SPI_SS              PA4
+#define PIN_SPI_SS1             PA4
+#define PIN_SPI_MOSI            PA7
+#define PIN_SPI_MISO            PA6
+#define PIN_SPI_SCK             PA5
 
 
 // Timer Definitions
@@ -118,8 +118,6 @@ extern "C" {
 #define PIN_SERIAL1_TX          PA9
 #define PIN_SERIAL2_RX          PA3
 #define PIN_SERIAL2_TX          PA2
-#define PIN_SERIAL6_RX          PA12
-#define PIN_SERIAL6_TX          PA11
 
 #ifdef __cplusplus
 } // extern "C"
