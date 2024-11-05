@@ -98,6 +98,10 @@
   #include "../lcd/extui/ui_api.h"
 #endif
 
+#if ENABLED(RTS_AVAILABLE)
+  #include "../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+#endif
+
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../core/debug_out.h"
 
@@ -1031,6 +1035,11 @@ float Probe::probe_at_point(
       // The user may want to quickly move the carriage or bed by hand to avoid bed damage from the (hot) nozzle.
       // This would also benefit from the contemplated "Audio Alerts" feature.
       stow();
+      #if ENABLED(TJC_AVAILABLE)
+        LCD_SERIAL.printf("page err_probefail");
+        LCD_SERIAL.printf("\xff\xff\xff");
+        showcount = 0;
+      #endif
       LCD_MESSAGE(MSG_LCD_PROBING_FAILED);
       #if DISABLED(G29_RETRY_AND_RECOVER)
         SERIAL_ERROR_MSG(STR_ERR_PROBING_FAILED);

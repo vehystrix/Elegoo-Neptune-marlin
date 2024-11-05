@@ -44,6 +44,8 @@
 #include "DGUSVPVariable.h"
 #include "DGUSDisplayDef.h"
 
+#include "../../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+
 DGUSDisplay dgus;
 
 #ifdef DEBUG_DGUS_COMM
@@ -74,6 +76,11 @@ void DGUSDisplay::initDisplay() {
   }
 
   requestScreen(TERN(SHOW_BOOTSCREEN, DGUS_SCREEN_BOOT, DGUS_SCREEN_MAIN));
+
+  #if ENABLED(RTS_AVAILABLE)
+    LCD_SERIAL.begin(LCD_BAUDRATE);
+    rtscheck.RTS_Init();
+  #endif
 }
 
 void DGUSDisplay::writeVariable(uint16_t adr, const void *values, uint8_t valueslen, bool isstr) {
@@ -135,6 +142,15 @@ void DGUSDisplay::writeVariablePGM(uint16_t adr, const void *values, uint8_t val
   }
 }
 
+#if ENABLED(RTS_AVAILABLE)
+  //DGUS_VP_Variable ramcopy;
+  //unsigned char tmp[8]={};
+  //unsigned char debug[128];
+  //bool flag_next_state_ms = true;
+  //uint32_t next_state_ms;
+  uint32_t count_state = 0;
+#endif
+
 void DGUSDisplay::processRx() {
 
   #if ENABLED(SERIAL_STATS_RX_BUFFER_OVERRUNS)
@@ -161,6 +177,10 @@ void DGUSDisplay::processRx() {
         receivedbyte = LCD_SERIAL.read();
         //DEBUGLCDCOMM_ECHOPGM(" ", receivedbyte);
         rx_datagram_state = (DGUS_HEADER2 == receivedbyte) ? DGUS_HEADER2_SEEN : DGUS_IDLE;
+        #if ENABLED(RTS_AVAILABLE)
+          count_state++;
+          if(DGUS_HEADER2 == receivedbyte)  count_state=0;
+        #endif
         break;
 
       case DGUS_HEADER2_SEEN: // Waiting for the length byte
@@ -169,6 +189,10 @@ void DGUSDisplay::processRx() {
 
         // Telegram min len is 3 (command and one word of payload)
         rx_datagram_state = WITHIN(rx_datagram_len, 3, DGUS_RX_BUFFER_SIZE) ? DGUS_WAIT_TELEGRAM : DGUS_IDLE;
+        #if ENABLED(RTS_AVAILABLE)
+          count_state++;
+          if(rx_datagram_state==DGUS_WAIT_TELEGRAM) count_state = 0;
+        #endif
         break;
 
       case DGUS_WAIT_TELEGRAM: // wait for complete datagram to arrive.
@@ -210,6 +234,11 @@ void DGUSDisplay::processRx() {
               ramcopy.set_by_display_handler(ramcopy, &tmp[3]);
           }
 
+          #if ENABLED(RTS_AVAILABLE)
+            count_state++;
+            if((command == DGUS_CMD_READVAR)||(command == DGUS_CMD_WRITEVAR && 'O' == tmp[0] && 'K' == tmp[1])) count_state=0;
+          #endif
+
           rx_datagram_state = DGUS_IDLE;
           break;
         }
@@ -218,6 +247,13 @@ void DGUSDisplay::processRx() {
       rx_datagram_state = DGUS_IDLE;
     }
   }
+  #if ENABLED(RTS_AVAILABLE)
+  if(count_state>=500)
+  {
+    count_state = 0;
+    rx_datagram_state = DGUS_IDLE;
+  }
+  #endif
 }
 
 size_t DGUSDisplay::getFreeTxBuffer() { return LCD_SERIAL_TX_BUFFER_FREE(); }
@@ -240,6 +276,9 @@ void DGUSDisplay::loop() {
   if (!no_reentrance) {
     no_reentrance = true;
     processRx();
+    #if ENABLED(RTS_AVAILABLE)
+      RTSUpdate();
+    #endif
     no_reentrance = false;
   }
 }

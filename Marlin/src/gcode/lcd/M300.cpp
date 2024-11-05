@@ -39,6 +39,14 @@
  *  E<0|1>       - Mute or enable sound
  */
 void GcodeSuite::M300() {
+  #ifdef TJC_AVAILABLE
+    uint16_t duration = parser.ushortval('P', 1000);
+    char temp[16];
+    memset(temp,0,sizeof(temp));
+    sprintf(temp, "beep %d", duration); 
+    LCD_SERIAL.printf(temp);
+    LCD_SERIAL.printf("\xff\xff\xff");
+  #else
 
   #if ENABLED(SOUND_MENU_ITEM)
     if (parser.seen('E')) {
@@ -54,6 +62,8 @@ void GcodeSuite::M300() {
   NOMORE(duration, 5000U);
 
   BUZZ(duration, frequency);
+
+  #endif  // NOT TJC_AVAILABLE
 }
 
 #endif // HAS_SOUND

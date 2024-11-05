@@ -174,6 +174,10 @@
   #include "../lcd/extui/dgus/DGUSDisplayDef.h"
 #endif
 
+#if ENABLED(RTS_AVAILABLE)
+  #include "../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+#endif
+
 #if ENABLED(HOTEND_IDLE_TIMEOUT)
   #include "../feature/hotend_idle.h"
 #endif
@@ -616,6 +620,26 @@ typedef struct SettingsDataStruct {
     xy_int_t mks_corner_offsets[5];                     // Bed Tramming
     xyz_int_t mks_park_pos;                             // Custom Parking (without NOZZLE_PARK)
     celsius_t mks_min_extrusion_temp;                   // Min E Temp (shadow M302 value)
+  #endif
+
+  //
+  // RTS UI
+  //
+  #if ENABLED(RTS_AVAILABLE)
+    celsius_t pla_extrusion_temp;
+    celsius_t pla_bed_temp;
+     
+    celsius_t petg_extrusion_temp;
+    celsius_t petg_bed_temp;
+
+    celsius_t abs_extrusion_temp;
+    celsius_t abs_bed_temp;
+
+    celsius_t tpu_extrusion_temp;
+    celsius_t tpu_bed_temp;
+
+    celsius_t probe_extrusion_temp;
+    celsius_t probe_bed_temp;  
   #endif
 
   #if HAS_MULTI_LANGUAGE
@@ -1743,6 +1767,26 @@ void MarlinSettings::postprocess() {
       EEPROM_WRITE(mks_park_pos);
       EEPROM_WRITE(mks_min_extrusion_temp);
     #endif
+    
+    //
+    // RTS UI
+    //
+    #if ENABLED(RTS_AVAILABLE)
+      EEPROM_WRITE(pla_extrusion_temp);
+      EEPROM_WRITE(pla_bed_temp);
+
+      EEPROM_WRITE(petg_extrusion_temp);
+      EEPROM_WRITE(petg_bed_temp);
+
+      EEPROM_WRITE(abs_extrusion_temp);
+      EEPROM_WRITE(abs_bed_temp);
+
+      EEPROM_WRITE(tpu_extrusion_temp);
+      EEPROM_WRITE(tpu_bed_temp);
+
+      EEPROM_WRITE(probe_extrusion_temp);
+      EEPROM_WRITE(probe_bed_temp);
+    #endif
 
     //
     // Selected LCD language
@@ -2867,6 +2911,23 @@ void MarlinSettings::postprocess() {
         EEPROM_READ(mks_min_extrusion_temp);
       #endif
 
+      #if ENABLED(RTS_AVAILABLE)
+        EEPROM_READ(pla_extrusion_temp);
+        EEPROM_READ(pla_bed_temp);
+
+        EEPROM_READ(petg_extrusion_temp);
+        EEPROM_READ(petg_bed_temp);
+
+        EEPROM_READ(abs_extrusion_temp);
+        EEPROM_READ(abs_bed_temp);
+
+        EEPROM_READ(tpu_extrusion_temp);
+        EEPROM_READ(tpu_bed_temp);
+
+        EEPROM_READ(probe_extrusion_temp);
+        EEPROM_READ(probe_bed_temp);
+      #endif
+
       //
       // Selected LCD language
       //
@@ -3674,6 +3735,23 @@ void MarlinSettings::reset() {
     TERN_(HAS_PLR_BED_THRESHOLD, recovery.bed_temp_threshold = PLR_BED_THRESHOLD);
   #endif
 
+  #if ENABLED(RTS_AVAILABLE)
+    #if ENABLED(TJC_AVAILABLE)
+      #if ENABLED(POWER_LOSS_RECOVERY)
+        if(recovery.enabled==0)
+        { 
+          LCD_SERIAL.printf("plrbutton.val=0");
+          LCD_SERIAL.printf("\xff\xff\xff"); 
+        }
+        else if(recovery.enabled==1)
+        {
+          LCD_SERIAL.printf("plrbutton.val=1");
+          LCD_SERIAL.printf("\xff\xff\xff"); 
+        }
+      #endif           
+    #endif
+  #endif
+
   //
   // Firmware Retraction
   //
@@ -3789,6 +3867,11 @@ void MarlinSettings::reset() {
   // MKS UI controller
   //
   TERN_(DGUS_LCD_UI_MKS, MKS_reset_settings());
+
+  //
+  // RTS UI
+  //
+  TERN_(RTS_AVAILABLE, RTS_reset_settings());
 
   //
   // Model predictive control
