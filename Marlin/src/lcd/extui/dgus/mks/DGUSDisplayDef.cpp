@@ -86,18 +86,60 @@ void MKS_pause_print_move() {
   // Save the current position, the raise amount, and 'already raised'
   TERN_(POWER_LOSS_RECOVERY, if (recovery.enabled) recovery.save(true, mks_park_pos.z, true));
 
+  #if ENABLED(RTS_AVAILABLE)
+    planner.synchronize();
+    const float olde = current_position.e;
+    current_position.e -= 3;
+    line_to_current_position(MMM_TO_MMS(1200));
+    current_position.e = olde;
+    planner.set_e_position_mm(olde);
+  #endif
+
   destination.z = _MIN(current_position.z + mks_park_pos.z, Z_MAX_POS);
   prepare_internal_move_to_destination(park_speed_z);
 
   destination.set(X_MIN_POS + mks_park_pos.x, Y_MIN_POS + mks_park_pos.y);
   prepare_internal_move_to_destination(park_speed_xy);
+
+  #if ENABLED(RTS_AVAILABLE)
+    planner.synchronize();
+    current_position.e += 2;
+    line_to_current_position(MMM_TO_MMS(200));
+    current_position.e = olde;
+    planner.set_e_position_mm(olde);
+  #endif
 }
 
 void MKS_resume_print_move() {
+
+  #if ENABLED(RTS_AVAILABLE)
+    planner.synchronize();
+    const float olde = current_position.e;
+    //current_position.e += 50;
+    //line_to_current_position(MMM_TO_MMS(250));
+    current_position.e -= 3;
+    line_to_current_position(MMM_TO_MMS(1200));
+    current_position.e = olde;
+    planner.set_e_position_mm(olde);
+    planner.synchronize();
+  #endif
+
   destination.set(position_before_pause.x, position_before_pause.y);
   prepare_internal_move_to_destination(park_speed_xy);
   destination.z = position_before_pause.z;
   prepare_internal_move_to_destination(park_speed_z);
+
+
+  #if ENABLED(RTS_AVAILABLE)
+    planner.synchronize();
+    current_position.e += 3;
+    //line_to_current_position(MMM_TO_MMS(2000));
+    line_to_current_position(MMM_TO_MMS(200));
+    current_position.e = olde;
+    planner.set_e_position_mm(olde);
+    planner.synchronize();
+  #endif
+
   TERN_(POWER_LOSS_RECOVERY, if (recovery.enabled) recovery.save(true));
 }
 

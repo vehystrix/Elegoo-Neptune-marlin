@@ -1728,7 +1728,11 @@ void MarlinUI::host_notify(const char * const cstr) {
       pause_show_message(PAUSE_MESSAGE_PARKING, PAUSE_MODE_PAUSE_PRINT); // Show message immediately to let user know about pause in progress
       queue.inject(F("M25 P\nM24"));
     #elif HAS_MEDIA
-      queue.inject(F("M25"));
+      #if ENABLED(TJC_AVAILABLE)
+        queue.inject(F("M10088"));
+      #else
+        queue.inject(F("M25"));
+      #endif
     #elif defined(ACTION_ON_PAUSE)
       hostui.pause();
     #endif

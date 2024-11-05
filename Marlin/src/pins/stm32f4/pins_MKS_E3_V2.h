@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2022 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2021 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -19,23 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+
 #pragma once
-
-/**
- * Creality V24S1_301F4 (STM32F401RC) board pin assignments as found on Ender-3 S1.
- */
-
-#ifndef BOARD_INFO_NAME
-  #define BOARD_INFO_NAME "Creality V24S1-301F4"
-#endif
-#ifndef DEFAULT_MACHINE_NAME
-  #define DEFAULT_MACHINE_NAME "Ender-3 S1 F4"
-#endif
 
 #define DISABLE_DEBUG false // DISABLE_(DEBUG|JTAG) is not supported for STM32F4.
 #define ALLOW_STM32F4
-
-#define EEPROM_EXCL_ZONE 916,926  // Ender-3S1 STM32F401 Bootloader EEPROM exclusion zone
 
 //
 // Limit Switches 
@@ -51,7 +39,7 @@
 //
 // Z Probe must be this pin
 //
-#define Z_MIN_PROBE_PIN                     PC14  // PROBE
+#define Z_MIN_PROBE_PIN                     PA8  // PROBE
 
 //
 // Temperature Sensors
@@ -82,22 +70,27 @@
 //
 // LED
 //
-#define LED3_PIN                            PC6    //照明灯
+#define LED3_PIN                            PB9    //顶灯
+
+//
+// BEEPER
+//
+#define BEEPER_PIN                          PC15   //蜂鸣器
+
+//
+// Auto fans
+//
+#define AUTO_FAN_PIN                        PB0    //FAN2
+#ifndef E0_AUTO_FAN_PIN
+  #define E0_AUTO_FAN_PIN           AUTO_FAN_PIN
+#endif
 
 //
 // Heaters / Fans
 //
 #define HEATER_0_PIN                        PA6    // "HE"
 #define HEATER_BED_PIN                      PA5    // "HB"
-#define FAN_PIN                             PB0    // "FAN0"
-
-//
-// Auto fans
-//
-#define AUTO_FAN_PIN                        PA7
-#ifndef E0_AUTO_FAN_PIN
-  #define E0_AUTO_FAN_PIN           AUTO_FAN_PIN
-#endif
+#define FAN_PIN                             PA7    // FAN1
 
 //
 // Filament Runout Sensor
@@ -107,12 +100,20 @@
 // Use one of these or SDCard-based Emulation will be used
 //#define SRAM_EEPROM_EMULATION                   // Use BackSRAM-based EEPROM emulation
 //#define FLASH_EEPROM_EMULATION                  // Use Flash-based EEPROM emulation
-#if EITHER(NO_EEPROM_SELECTED, I2C_EEPROM)
+#if ANY(NO_EEPROM_SELECTED, I2C_EEPROM)
   #define I2C_EEPROM
   #define MARLIN_EEPROM_SIZE              0x1000  // 4KB
   #define I2C_SCL_PIN                       PB6
   #define I2C_SDA_PIN                       PB7
 #endif
+
+// Оn the servos connector
+#ifndef FIL_RUNOUT_PIN
+  #define FIL_RUNOUT_PIN                       CHECKFILEMENT0_PIN
+#endif
+
+
+
 
 //
 // Onboard SD card
@@ -132,4 +133,5 @@
   #define SD_SPI_SPEED                      SPI_FULL_SPEED        
 #endif
 
-// #include "../stm32f1/pins_CREALITY_V24S1_301.h"
+// Ignore temp readings during development.
+//#define BOGUS_TEMPERATURE_GRACE_PERIOD    2000

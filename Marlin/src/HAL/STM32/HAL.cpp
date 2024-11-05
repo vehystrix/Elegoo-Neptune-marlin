@@ -77,6 +77,11 @@ void MarlinHAL::init() {
     OUT_WRITE(LED_PIN, LOW);
   #endif
 
+  //开照明灯
+  #ifdef RTS_AVAILABLE
+    OUT_WRITE(LED3_PIN, HIGH);
+  #endif
+
   #if ENABLED(SRAM_EEPROM_EMULATION)
     __HAL_RCC_PWR_CLK_ENABLE();
     HAL_PWR_EnableBkUpAccess();           // Enable access to backup SRAM

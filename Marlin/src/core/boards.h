@@ -461,6 +461,7 @@
 #define BOARD_MKS_EAGLE               5239  // MKS Eagle (STM32F407VE)
 #define BOARD_ARTILLERY_RUBY          5240  // Artillery Ruby (STM32F401RC)
 #define BOARD_CREALITY_V24S1_301F4    5241  // Creality v2.4.S1_301F4 (STM32F401RC) as found in the Ender-3 S1 F4
+#define BOARD_MKS_E3D_V2              4241  // MKS Robin E3D (STM32F401RCT6)
 #define BOARD_CREALITY_CR4NTXXC10     5242  // Creality E3 Free-runs Silent Motherboard (STM32F401RET6)
 #define BOARD_OPULO_LUMEN_REV4        5243  // Opulo Lumen PnP Controller REV4 (STM32F407VE / STM32F407VG)
 #define BOARD_FYSETC_SPIDER_KING407   5244  // FYSETC Spider King407 (STM32F407ZG)

@@ -39,6 +39,10 @@
   #include "../../lcd/sovol_rts/sovol_rts.h"
 #endif
 
+#if ENABLED(RTS_AVAILABLE)
+  #include "../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+#endif
+
 extern xyze_pos_t destination;
 
 #if ENABLED(VARIABLE_G0_FEEDRATE)
@@ -63,7 +67,12 @@ void GcodeSuite::G0_G1(TERN_(HAS_FAST_MOVES, const bool fast_move/*=false*/)) {
     #endif
   #endif
 
+  #if ENABLED(RTS_AVAILABLE)
+  if(Move_finish_flag)
+  #endif
+  {
   get_destination_from_command();                 // Get X Y [Z[I[J[K]]]] [E] F (and set cutter power)
+  }
 
   #ifdef G0_FEEDRATE
     if (fast_move) {
@@ -122,4 +131,8 @@ void GcodeSuite::G0_G1(TERN_(HAS_FAST_MOVES, const bool fast_move/*=false*/)) {
   #endif
 
   TERN_(SOVOL_SV06_RTS, RTS_PauseMoveAxisPage());
+
+  #if ENABLED(RTS_AVAILABLE)
+    RTS_PauseMoveAxisPage();
+  #endif
 }

@@ -265,6 +265,10 @@
   #include "tests/marlin_tests.h"
 #endif
 
+#if ENABLED(RTS_AVAILABLE)
+  #include "lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+#endif
+
 #if HAS_RS485_SERIAL
   #include "feature/rs485.h"
 #endif
@@ -281,6 +285,9 @@ bool wait_for_heatup = false;
   bool wait_for_user; // = false
 
   void wait_for_user_response(millis_t ms/*=0*/, const bool no_sleep/*=false*/) {
+    #if ENABLED(RTS_AVAILABLE)
+      wait_for_user = false;
+    #else
     UNUSED(no_sleep);
     KEEPALIVE_STATE(PAUSED_FOR_USER);
     wait_for_user = true;
@@ -289,6 +296,7 @@ bool wait_for_heatup = false;
       idle(TERN_(ADVANCED_PAUSE_FEATURE, no_sleep));
     wait_for_user = false;
     while (ui.button_pressed()) safe_delay(50);
+    #endif
   }
 
 #endif
@@ -379,7 +387,23 @@ void startOrResumeJob() {
 
     TERN_(POWER_LOSS_RECOVERY, recovery.purge());
 
-    #ifdef EVENT_GCODE_SD_ABORT
+    #if ENABLED(RTS_AVAILABLE)
+      if(abortSD_flag)
+      {
+        do_blocking_move_to_z(current_position.z + 5, 100);
+        #ifdef EVENT_GCODE_SD_ABORT_2
+          queue.inject(F(EVENT_GCODE_SD_ABORT_2));
+        #endif
+        abortSD_flag = false;
+      }
+      else
+      {
+        #ifdef EVENT_GCODE_SD_ABORT
+          queue.inject(F(EVENT_GCODE_SD_ABORT));
+        #endif
+      }
+      queue.enqueue_now_P(PSTR("M84"));
+    #elif EVENT_GCODE_SD_ABORT
       queue.inject(F(EVENT_GCODE_SD_ABORT));
     #endif
 
@@ -832,6 +856,8 @@ void idle(const bool no_stepper_sleep/*=false*/) {
   #else
     ui.update();
   #endif
+  
+  TERN_(EXTENSIBLE_UI, ExtUI::onIdle());
 
   // Run i2c Position Encoders
   #if ENABLED(I2C_POSITION_ENCODERS)

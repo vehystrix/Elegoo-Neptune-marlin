@@ -47,6 +47,13 @@
 
 #include "../../MarlinCore.h" // for startOrResumeJob
 
+#if ENABLED(TJC_AVAILABLE)
+  #include "../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+  #if HAS_DISPLAY
+    #include "../../gcode/queue.h"
+  #endif
+#endif
+
 /**
  * M24: Start or Resume SD Print
  */
@@ -82,6 +89,12 @@ void GcodeSuite::M24() {
     TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_open(PROMPT_INFO, F("Resuming SD"), FPSTR(DISMISS_STR)));
   #endif
 
+  #if ENABLED(TJC_AVAILABLE)
+    restFlag1 = 0;
+    LCD_SERIAL.printf("restFlag1=0");
+    LCD_SERIAL.printf("\xff\xff\xff");
+  #endif
+
   ui.reset_status();
 }
 
@@ -92,14 +105,8 @@ void GcodeSuite::M24() {
  *   Invoke M125 to store the current position and move to the park
  *   position. M24 will move the head back before resuming the print.
  */
-void GcodeSuite::M25() {
-
-  #if ENABLED(PARK_HEAD_ON_PAUSE)
-
-    M125();
-
-  #else
-
+namespace {
+  inline void do_M25() {
     // Set initial pause flag to prevent more commands from landing in the queue while we try to pause
     if (IS_SD_PRINTING()) card.pauseSDPrint();
 
@@ -119,8 +126,28 @@ void GcodeSuite::M25() {
         hostui.pause();
       #endif
     #endif
+  }
+}
+void GcodeSuite::M25() {
 
+  #if ENABLED(PARK_HEAD_ON_PAUSE)
+
+    M125();
+
+  #else
+    #if ENABLED(TJC_AVAILABLE)
+      RTS_Pause_Api();
+      queue.inject(F("M10088"));
+    #else
+      do_M25();
+    #endif  // NOT TJC_AVAILABLE
   #endif
 }
+
+#if ENABLED(TJC_AVAILABLE)
+  void GcodeSuite::M10088() {
+    do_M25();
+  }
+#endif
 
 #endif // HAS_MEDIA
