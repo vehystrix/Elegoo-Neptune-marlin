@@ -26,6 +26,10 @@
 
 #include "caselight.h"
 
+#if ENABLED(TJC_AVAILABLE)
+  #include "../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+#endif
+
 CaseLight caselight;
 
 #if CASELIGHT_USES_BRIGHTNESS && !defined(CASE_LIGHT_DEFAULT_BRIGHTNESS)
@@ -98,6 +102,8 @@ void CaseLight::update(const bool sflag) {
   #if ENABLED(CASE_LIGHT_USE_RGB_LED)
     if (leds.lights_on) leds.update(); else leds.set_off();
   #endif
+
+  TERN_(TJC_AVAILABLE, RTS_SetCaseLight(caselight.on));
 }
 
 #endif // CASE_LIGHT_ENABLE

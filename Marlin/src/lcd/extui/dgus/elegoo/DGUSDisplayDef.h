@@ -385,6 +385,7 @@
   void RTS_AutoBedLevelPage();
   void RTS_MoveAxisHoming();
   void EachMomentUpdate();
+  void RTS_SetCaseLight(bool active);
 
   #define MACVERSION              STRING_CONFIG_H_AUTHOR
   

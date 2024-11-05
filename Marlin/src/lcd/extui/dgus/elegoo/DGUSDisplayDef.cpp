@@ -53,7 +53,10 @@
   #include "../../../../lcd/extui/dgus/DGUSScreenHandler.h"
   #include "../../../../lcd/extui/dgus/DGUSScreenHandlerBase.h"
   #include "../../../../../src/feature/host_actions.h"
-
+  
+  #if ENABLED(CASE_LIGHT_ENABLE)
+    #include "../../../../../src/feature/caselight.h"
+  #endif
 
   
 
@@ -5552,30 +5555,13 @@
         }
         else if (recdat.data[0] == 8) //LED3
         {
-          if(status_led2) 
-          {
-            status_led2 = false;
-            RTS_SndData(1, ICON_ADJUST_LED3);
-            #if ENABLED(TJC_AVAILABLE) 
-              LCD_SERIAL.printf("status_led2=0");
-              LCD_SERIAL.printf("\xff\xff\xff");
-            #endif
-            #if PIN_EXISTS(LED3)
-              OUT_WRITE(LED3_PIN, LOW);
-            #endif
-          }
-          else 
-          {
-            status_led2 = true;
-            RTS_SndData(0, ICON_ADJUST_LED3);
-            #if ENABLED(TJC_AVAILABLE) 
-              LCD_SERIAL.printf("status_led2=1");
-              LCD_SERIAL.printf("\xff\xff\xff");
-            #endif
-            #if PIN_EXISTS(LED3)
-              OUT_WRITE(LED3_PIN, HIGH);
-            #endif
-          }
+          #if ENABLED(CASE_LIGHT_ENABLE)
+            caselight.on = !status_led2;
+            if (caselight.on) caselight.brightness = 255;
+            caselight.update(false);  // will trigger a screen update
+          #else
+            RTS_SetCaseLight(!status_led2);  // only update the screen
+          #endif
         }
         else if (recdat.data[0] == 9)
         {
@@ -8160,6 +8146,19 @@
   }
 
 
+  void RTS_SetCaseLight(bool active){
+    if (active) {
+      status_led2 = true;
+      rtscheck.RTS_SndData(1, ICON_ADJUST_LED3);
+      LCD_SERIAL.printf("status_led2=1");
+      LCD_SERIAL.printf("\xff\xff\xff");
+    } else {
+      status_led2 = false;
+      rtscheck.RTS_SndData(0, ICON_ADJUST_LED3);
+      LCD_SERIAL.printf("status_led2=0");
+      LCD_SERIAL.printf("\xff\xff\xff");
+    }
+  }
 
 
 #endif
