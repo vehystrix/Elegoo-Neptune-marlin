@@ -708,7 +708,7 @@ class Planner {
         if (last_fade_z != rz) {
           last_fade_z = rz;
           z_fade_factor = 1 - rz * inverse_z_fade_height;
-          z_fade_factor = 1.003 * (1 - rz * inverse_z_fade_height * rz * inverse_z_fade_height) ;
+          //z_fade_factor = 1.003 * (1 - rz * inverse_z_fade_height * rz * inverse_z_fade_height) ;
         }
         return z_fade_factor;
       }
