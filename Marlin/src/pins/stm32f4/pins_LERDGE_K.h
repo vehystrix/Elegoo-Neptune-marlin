@@ -114,9 +114,9 @@
 //#endif
 
 #if HAS_TMC_UART
-  /**
-   * TMC2208/TMC2209 stepper drivers
-   */
+  //
+  // TMC2208/TMC2209 stepper drivers
+  //
   #ifndef X_SERIAL_TX_PIN
     #define X_SERIAL_TX_PIN                 PB2
   #endif
@@ -136,10 +136,9 @@
   #ifndef EX_SERIAL_TX_PIN
     #define EX_SERIAL_TX_PIN                PE0
   #endif
-  //#define Z2_SERIAL_RX_PIN    EX_SERIAL_RX_PIN
   //#define Z2_SERIAL_TX_PIN    EX_SERIAL_TX_PIN
-  //#define E2_SERIAL_RX_PIN    EX_SERIAL_RX_PIN
   //#define E2_SERIAL_TX_PIN    EX_SERIAL_TX_PIN
+
   // Reduce baud rate to improve software serial reliability
   #ifndef TMC_BAUD_RATE
     #define TMC_BAUD_RATE                  19200
