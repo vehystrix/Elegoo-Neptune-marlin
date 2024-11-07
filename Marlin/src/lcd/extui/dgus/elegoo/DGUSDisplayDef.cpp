@@ -201,7 +201,7 @@
   static int16_t max_top           = 0;
   static int16_t old_top_file      = 0; //< file on top of file chooser
   static int16_t file_to_print     = 0; //< touched file to be confirmed
-  bool Multifile_flag  = false;
+  bool Multifile_flag  = true;
 
   void RTS_reset_settings(void) 
   {
@@ -1091,6 +1091,14 @@
         // LCD_SERIAL_2.printf("\xff\xff\xff");
 
       #endif
+
+      if (Multifile_flag) {
+        LCD_SERIAL_2.printf("multiset.file.pic=77");
+        LCD_SERIAL_2.printf("\xff\xff\xff");
+      } else {
+        LCD_SERIAL_2.printf("multiset.file.pic=76");
+        LCD_SERIAL_2.printf("\xff\xff\xff");
+      }
 
       /**************************some info init*******************************/
       RTS_SndData(0, PRINT_PROCESS_ICON_VP);
