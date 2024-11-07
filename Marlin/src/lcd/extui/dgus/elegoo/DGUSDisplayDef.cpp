@@ -1240,6 +1240,7 @@
               {
                 rtscheck.RTS_SndData(count_startprogress, START1_PROCESS_ICON_VP);
                 delay(30);
+                TERN_(USE_WATCHDOG, hal.watchdog_refresh(););
               }
               rtscheck.RTS_SndData(StartSoundSet, SoundAddr);
 
