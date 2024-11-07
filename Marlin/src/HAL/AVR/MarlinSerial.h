@@ -283,6 +283,25 @@
   extern MSerialLCD lcdSerial;
 #endif
 
+#ifdef LCD_SERIAL_PORT_2
+
+  template <uint8_t serial>
+  struct LCDSerialCfg {
+    static constexpr int PORT               = serial;
+    static constexpr unsigned int RX_SIZE   = TERN(HAS_DGUS_LCD, DGUS_RX_BUFFER_SIZE,  64);
+    static constexpr unsigned int TX_SIZE   = TERN(HAS_DGUS_LCD, DGUS_TX_BUFFER_SIZE, 128);
+    static constexpr bool XONOFF            = false;
+    static constexpr bool EMERGENCYPARSER   = ENABLED(EMERGENCY_PARSER);
+    static constexpr bool DROPPED_RX        = false;
+    static constexpr bool RX_FRAMING_ERRORS = false;
+    static constexpr bool MAX_RX_QUEUED     = false;
+    static constexpr bool RX_OVERRUNS       = BOTH(HAS_DGUS_LCD, SERIAL_STATS_RX_BUFFER_OVERRUNS);
+  };
+
+  typedef Serial1Class< MarlinSerial< LCDSerialCfg<LCD_SERIAL_PORT_2> > > MSerialLCD_2;
+  extern MSerialLCD_2 lcdSerial_2;
+#endif
+
 // Use the UART for Bluetooth in AT90USB configurations
 #if defined(USBCON) && ENABLED(BLUETOOTH)
   typedef Serial1Class<HardwareSerial> MSerialBT;

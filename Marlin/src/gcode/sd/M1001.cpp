@@ -132,8 +132,8 @@ void GcodeSuite::M1001() {
     rtscheck.RTS_SndData(ExchangePageBase + 9, ExchangepageAddr);
     
     #if ENABLED(TJC_AVAILABLE) 
-      LCD_SERIAL.printf("page printfinish");
-      LCD_SERIAL.printf("\xff\xff\xff");
+      LCD_SERIAL_2.printf("page printfinish");
+      LCD_SERIAL_2.printf("\xff\xff\xff");
       queue.enqueue_now_P(PSTR("M84")); 
     #endif
     

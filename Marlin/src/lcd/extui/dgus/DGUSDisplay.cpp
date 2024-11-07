@@ -78,7 +78,7 @@ void DGUSDisplay::initDisplay() {
   requestScreen(TERN(SHOW_BOOTSCREEN, DGUS_SCREEN_BOOT, DGUS_SCREEN_MAIN));
 
   #if ENABLED(RTS_AVAILABLE)
-    LCD_SERIAL.begin(LCD_BAUDRATE);
+    LCD_SERIAL_2.begin(LCD_BAUDRATE);
     rtscheck.RTS_Init();
   #endif
 }
@@ -143,11 +143,11 @@ void DGUSDisplay::writeVariablePGM(uint16_t adr, const void *values, uint8_t val
 }
 
 #if ENABLED(RTS_AVAILABLE)
-  //DGUS_VP_Variable ramcopy;
-  //unsigned char tmp[8]={};
-  //unsigned char debug[128];
-  //bool flag_next_state_ms = true;
-  //uint32_t next_state_ms;
+  DGUS_VP_Variable ramcopy;
+  unsigned char tmp[8]={};
+  unsigned char debug[128];
+  bool flag_next_state_ms = true;
+  uint32_t next_state_ms;
   uint32_t count_state = 0;
 #endif
 
@@ -247,7 +247,129 @@ void DGUSDisplay::processRx() {
       rx_datagram_state = DGUS_IDLE;
     }
   }
+
   #if ENABLED(RTS_AVAILABLE)
+  if(LCD_SERIAL_2.available())
+  {
+    switch (rx_datagram_state) 
+    {
+      case DGUS_IDLE: // Waiting for the first header byte
+      {
+        receivedbyte = LCD_SERIAL_2.read();
+        //DEBUG_ECHOPGM("< ",x);
+        if (DGUS_HEADER1 == receivedbyte) rx_datagram_state = DGUS_HEADER1_SEEN;
+      }
+      break;
+
+      case DGUS_HEADER1_SEEN: // Waiting for the second header byte
+      {
+        receivedbyte = LCD_SERIAL_2.read();
+        //DEBUG_ECHOPGM(" ",x);
+        rx_datagram_state = (DGUS_HEADER2 == receivedbyte) ? DGUS_HEADER2_SEEN : DGUS_IDLE;
+
+        #if ENABLED(RTS_AVAILABLE)
+          count_state++;
+          if(DGUS_HEADER2 == receivedbyte)  count_state=0;
+        #endif
+      }
+      break;
+
+      case DGUS_HEADER2_SEEN: // Waiting for the length byte
+      {
+        rx_datagram_len = LCD_SERIAL_2.read();
+        DEBUG_ECHOPGM(" (", rx_datagram_len, ") ");
+        // Telegram min len is 3 (command and one word of payload)
+        rx_datagram_state = WITHIN(rx_datagram_len, 3, DGUS_RX_BUFFER_SIZE) ? DGUS_WAIT_TELEGRAM : DGUS_IDLE;
+        #if ENABLED(RTS_AVAILABLE)
+          count_state++;
+          if(rx_datagram_state==DGUS_WAIT_TELEGRAM) count_state = 0;
+        #endif
+        //SERIAL_ECHOLNPGM("receive rx_datagram_len\r\n");
+      }
+      break;
+
+      case DGUS_WAIT_TELEGRAM: // wait for complete datagram to arrive.
+      {
+        if (LCD_SERIAL_2.available() < rx_datagram_len) return;
+        //SERIAL_ECHOLNPGM("dgus wait telegram\r\n");
+
+        initialized = true; // We've talked to it, so we defined it as initialized.
+        uint8_t command = LCD_SERIAL_2.read();
+
+        DEBUG_ECHOPGM("# ", command);
+
+        uint8_t readlen = rx_datagram_len - 1;  // command is part of len.
+        //unsigned char tmp[rx_datagram_len - 1];
+        //unsigned char *ptmp = tmp;
+        unsigned char count = 0;
+        while (readlen--) 
+        {
+          receivedbyte = LCD_SERIAL_2.read();
+          DEBUG_ECHOPGM(" ", receivedbyte);
+          //*ptmp++ = receivedbyte;
+          tmp[count++] = receivedbyte;
+        }
+        DEBUG_ECHOPGM(" # ");
+
+        // mostly we'll get this: 5A A5 03 82 4F 4B -- ACK on 0x82, so discard it.
+        if (command == DGUS_CMD_WRITEVAR && 'O' == tmp[0] && 'K' == tmp[1]) 
+        {
+          DEBUG_ECHOLNPGM(">");
+          //SERIAL_ECHOLNPGM("receive 0x82\r\n");
+          rx_datagram_state = DGUS_IDLE;
+          break;
+        }
+
+        /* AutoUpload, (and answer to) Command 0x83 :
+        |      tmp[0  1  2  3  4 ... ]
+        | Example 5A A5 06 83 20 01 01 78 01 ……
+        |          / /  |  |   \ /   |  \     \
+        |        Header |  |    |    |   \_____\_ DATA (Words!)
+        |     DatagramLen  /  VPAdr  |
+        |           Command          DataLen (in Words) */
+        if (command == DGUS_CMD_READVAR) 
+        {
+          #if ENABLED(RTS_AVAILABLE)
+            const uint8_t dlen = (tmp[2] << 1);  // Convert to Bytes. (Display works with words)
+            rtscheck.recdat.command = command;
+            rtscheck.recdat.addr = ((tmp[0] << 8) | tmp[1]);
+            rtscheck.recdat.len = tmp[2];
+            for (unsigned int i = 0; i < dlen; i += 2)
+            {
+              rtscheck.recdat.data[i / 2] = ((tmp[3 + i] << 8) | tmp[4 + i]);
+            }
+            rtscheck.RTS_HandleData();
+          #else
+            const uint16_t vp = tmp[0] << 8 | tmp[1];
+            //const uint8_t dlen = tmp[2] << 1;  // Convert to Bytes. (Display works with words)
+            //DEBUG_ECHOPGM(" vp=", vp, " dlen=", dlen);
+            DGUS_VP_Variable ramcopy;
+            if (populate_VPVar(vp, &ramcopy)) {
+              if (ramcopy.set_by_display_handler)
+                ramcopy.set_by_display_handler(ramcopy, &tmp[3]);
+              else
+                DEBUG_ECHOLNPGM(" VPVar found, no handler.");
+            }
+            else
+              DEBUG_ECHOLNPGM(" VPVar not found:", vp);
+          #endif
+
+          #if ENABLED(RTS_AVAILABLE)
+            count_state++;
+            if((command == DGUS_CMD_READVAR)||(command == DGUS_CMD_WRITEVAR && 'O' == tmp[0] && 'K' == tmp[1])) count_state=0;
+          #endif
+
+          rx_datagram_state = DGUS_IDLE;
+          break;
+        }
+      }
+      break;
+
+      // discard anything else
+      rx_datagram_state = DGUS_IDLE;
+    }
+  }
+
   if(count_state>=500)
   {
     count_state = 0;
@@ -272,15 +394,17 @@ void DGUSDisplay::writePGM(const char str[], uint8_t len) {
 }
 
 void DGUSDisplay::loop() {
+  #if ENABLED(RTS_AVAILABLE)
+    processRx();
+    RTSUpdate();
+  #else
   // Protect against recursion. processRx() may indirectly call idle() when injecting G-code commands.
   if (!no_reentrance) {
     no_reentrance = true;
-    processRx();
-    #if ENABLED(RTS_AVAILABLE)
-      RTSUpdate();
-    #endif
+      processRx();
     no_reentrance = false;
   }
+  #endif
 }
 
 rx_datagram_state_t DGUSDisplay::rx_datagram_state = DGUS_IDLE;

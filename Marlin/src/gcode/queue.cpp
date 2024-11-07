@@ -586,8 +586,8 @@ void GCodeQueue::get_serial_commands() {
       const bool card_eof = card.eof();
       if (n < 0 && !card_eof) {
         #if ENABLED(TJC_AVAILABLE)  
-          LCD_SERIAL.printf("page err_sdread");
-          LCD_SERIAL.printf("\xff\xff\xff");
+          LCD_SERIAL_2.printf("page err_sdread");
+          LCD_SERIAL_2.printf("\xff\xff\xff");
         #endif
         SERIAL_ERROR_MSG(STR_SD_ERR_READ);
         continue;

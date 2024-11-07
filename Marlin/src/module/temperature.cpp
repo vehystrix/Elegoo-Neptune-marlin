@@ -898,8 +898,8 @@ volatile bool Temperature::raw_temps_ready = false;
               }
               else if (ELAPSED(ms, temp_change_ms)) {                 // Watch timer expired
                 #if ENABLED(RTS_AVAILABLE) && ENABLED(TJC_AVAILABLE)
-                  LCD_SERIAL.printf("page err_heatfail"); 
-                  LCD_SERIAL.printf("\xff\xff\xff");
+                  LCD_SERIAL_2.printf("page err_heatfail"); 
+                  LCD_SERIAL_2.printf("\xff\xff\xff");
                 #endif
                 TERN_(SOVOL_SV06_RTS, rts.gotoPageBeep(ID_KillHeat_L, ID_KillHeat_D));
                 _TEMP_ERROR(heater_id, FPSTR(str_t_heating_failed), MSG_ERR_HEATING_FAILED, current_temp);
@@ -908,8 +908,8 @@ volatile bool Temperature::raw_temps_ready = false;
             else if (current_temp < target - (MAX_OVERSHOOT_PID_AUTOTUNE)) { // Heated, then temperature fell too far?
               #if ENABLED(RTS_AVAILABLE)
                 #if ENABLED(TJC_AVAILABLE)
-                  LCD_SERIAL.printf("page err_heatfail"); 
-                  LCD_SERIAL.printf("\xff\xff\xff");
+                  LCD_SERIAL_2.printf("page err_heatfail"); 
+                  LCD_SERIAL_2.printf("\xff\xff\xff");
                 #endif
               #endif
               TERN_(SOVOL_SV06_RTS, rts.gotoPageBeep(ID_KillRunaway_L, ID_KillRunaway_D));
@@ -1611,13 +1611,13 @@ void Temperature::maxtemp_error(const heater_id_t heater_id OPTARG(ERR_INCLUDE_T
     #if ENABLED(RTS_AVAILABLE) && ENABLED(TJC_AVAILABLE)
       if(heater_id==H_E0)
       {
-        LCD_SERIAL.printf("page err_nozzleover");
-        LCD_SERIAL.printf("\xff\xff\xff");     
+        LCD_SERIAL_2.printf("page err_nozzleover");
+        LCD_SERIAL_2.printf("\xff\xff\xff");     
       }
       else if(heater_id==H_BED)
       {
-        LCD_SERIAL.printf("page err_bedover");
-        LCD_SERIAL.printf("\xff\xff\xff");       
+        LCD_SERIAL_2.printf("page err_bedover");
+        LCD_SERIAL_2.printf("\xff\xff\xff");       
       }
     #endif
   #endif
@@ -1632,13 +1632,13 @@ void Temperature::mintemp_error(const heater_id_t heater_id OPTARG(ERR_INCLUDE_T
     #if ENABLED(RTS_AVAILABLE) && ENABLED(TJC_AVAILABLE)
       if(heater_id==H_E0)
       {
-        LCD_SERIAL.printf("page err_nozzleunde");
-        LCD_SERIAL.printf("\xff\xff\xff");     
+        LCD_SERIAL_2.printf("page err_nozzleunde");
+        LCD_SERIAL_2.printf("\xff\xff\xff");     
       }
       else if(heater_id==H_BED)
       {
-        LCD_SERIAL.printf("page err_bedunder");
-        LCD_SERIAL.printf("\xff\xff\xff");       
+        LCD_SERIAL_2.printf("page err_bedunder");
+        LCD_SERIAL_2.printf("\xff\xff\xff");       
       }
     #endif
   #endif
@@ -1872,8 +1872,8 @@ void Temperature::mintemp_error(const heater_id_t heater_id OPTARG(ERR_INCLUDE_T
             TERN_(DWIN_CREALITY_LCD, dwinPopupTemperature(0));
             TERN_(EXTENSIBLE_UI, ExtUI::onHeatingError(e));
             #if ENABLED(RTC_AVAILABLE) && ENABLED(TJC_AVAILABLE)
-              LCD_SERIAL.printf("page err_nozzleheat"); 
-              LCD_SERIAL.printf("\xff\xff\xff");
+              LCD_SERIAL_2.printf("page err_nozzleheat"); 
+              LCD_SERIAL_2.printf("\xff\xff\xff");
             #endif
             _TEMP_ERROR(e, FPSTR(str_t_heating_failed), MSG_ERR_HEATING_FAILED, temp);
           }
@@ -3394,8 +3394,8 @@ void Temperature::init() {
         TERN_(DWIN_CREALITY_LCD, dwinPopupTemperature(0));
         TERN_(EXTENSIBLE_UI, ExtUI::onHeatingError(heater_id));
         #if ENABLED(RTS_AVAILABLE) && ENABLED(TJC_AVAILABLE)
-          LCD_SERIAL.printf("page err_heatfail"); 
-          LCD_SERIAL.printf("\xff\xff\xff");
+          LCD_SERIAL_2.printf("page err_heatfail"); 
+          LCD_SERIAL_2.printf("\xff\xff\xff");
         #endif
         _TEMP_ERROR(heater_id, FPSTR(str_t_thermal_runaway), MSG_ERR_THERMAL_RUNAWAY, current);
         break;
@@ -4749,13 +4749,13 @@ void Temperature::isr() {
               //全局变量
               restFlag1 = 0;
               restFlag2 = 1;
-              LCD_SERIAL.printf("restFlag1=0");
-              LCD_SERIAL.printf("\xff\xff\xff");
-              LCD_SERIAL.printf("restFlag2=1");
-              LCD_SERIAL.printf("\xff\xff\xff");
+              LCD_SERIAL_2.printf("restFlag1=0");
+              LCD_SERIAL_2.printf("\xff\xff\xff");
+              LCD_SERIAL_2.printf("restFlag2=1");
+              LCD_SERIAL_2.printf("\xff\xff\xff");
 
-              LCD_SERIAL.printf("page printpause");
-              LCD_SERIAL.printf("\xff\xff\xff");
+              LCD_SERIAL_2.printf("page printpause");
+              LCD_SERIAL_2.printf("\xff\xff\xff");
             #endif 
           }
         #endif

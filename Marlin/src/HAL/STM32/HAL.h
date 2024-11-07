@@ -117,6 +117,21 @@
   #endif
 #endif
 
+#ifdef LCD_SERIAL_PORT_2
+  #if WITHIN(LCD_SERIAL_PORT_2, 1, 9)
+    #define LCD_SERIAL_2 MSERIAL(LCD_SERIAL_PORT_2)
+  #elif !defined(USBCON)
+    #error "LCD_SERIAL_PORT must be from 1 to 9."
+  #elif LCD_SERIAL_PORT == -1
+    #define LCD_SERIAL MSerialUSB
+  #else
+    #error "LCD_SERIAL_PORT must be from 1 to 9, or -1 for Native USB."
+  #endif
+  #if ANY(HAS_DGUS_LCD, EXTENSIBLE_UI)
+    #define SERIAL2_GET_TX_BUFFER_FREE() LCD_SERIAL_2.availableForWrite()
+  #endif
+#endif
+
 #ifdef RS485_SERIAL_PORT
   #if WITHIN(RS485_SERIAL_PORT, 1, 9)
     #define RS485_SERIAL MSERIAL(RS485_SERIAL_PORT)

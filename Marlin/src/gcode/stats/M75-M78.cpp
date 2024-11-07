@@ -48,11 +48,11 @@ void GcodeSuite::M75() {
   startOrResumeJob(); // ... ExtUI::onPrintTimerStarted()
 
   #if ENABLED(TJC_AVAILABLE)
-    LCD_SERIAL.printf("page printpause"); 
-    LCD_SERIAL.printf("\xff\xff\xff");  
+    LCD_SERIAL_2.printf("page printpause"); 
+    LCD_SERIAL_2.printf("\xff\xff\xff");  
     restFlag1 = 0;
-    LCD_SERIAL.printf("restFlag1=0");  //9999----打印界面显示：1-恢复按钮 0-暂停按钮
-    LCD_SERIAL.printf("\xff\xff\xff");
+    LCD_SERIAL_2.printf("restFlag1=0");  //9999----打印界面显示：1-恢复按钮 0-暂停按钮
+    LCD_SERIAL_2.printf("\xff\xff\xff");
   #endif
 
   #if ENABLED(DWIN_LCD_PROUI)
@@ -68,10 +68,10 @@ void GcodeSuite::M76() {
   #if ENABLED(TJC_AVAILABLE)
     restFlag1 = 1;//9999----打印界面显示：同时判断restFlag1 = 1  restFlag2 = 0      1-恢复按钮 0-暂停按钮
     restFlag2 = 0;
-    LCD_SERIAL.printf("restFlag1=1");
-    LCD_SERIAL.printf("\xff\xff\xff");
-    LCD_SERIAL.printf("restFlag2=0");
-    LCD_SERIAL.printf("\xff\xff\xff");
+    LCD_SERIAL_2.printf("restFlag1=1");
+    LCD_SERIAL_2.printf("\xff\xff\xff");
+    LCD_SERIAL_2.printf("restFlag2=0");
+    LCD_SERIAL_2.printf("\xff\xff\xff");
   #endif
 
 
@@ -84,8 +84,8 @@ void GcodeSuite::M76() {
  */
 void GcodeSuite::M77() {
   #if ENABLED(TJC_AVAILABLE)
-    LCD_SERIAL.printf("page main"); 
-    LCD_SERIAL.printf("\xff\xff\xff");  
+    LCD_SERIAL_2.printf("page main"); 
+    LCD_SERIAL_2.printf("\xff\xff\xff");  
   #endif
 
   print_job_timer.stop();

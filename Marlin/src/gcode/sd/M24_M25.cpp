@@ -91,8 +91,8 @@ void GcodeSuite::M24() {
 
   #if ENABLED(TJC_AVAILABLE)
     restFlag1 = 0;
-    LCD_SERIAL.printf("restFlag1=0");
-    LCD_SERIAL.printf("\xff\xff\xff");
+    LCD_SERIAL_2.printf("restFlag1=0");
+    LCD_SERIAL_2.printf("\xff\xff\xff");
   #endif
 
   ui.reset_status();

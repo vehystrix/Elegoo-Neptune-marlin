@@ -809,29 +809,29 @@ G29_TYPE GcodeSuite::G29() {
                   #if ENABLED(NEPTUNE_3_PLUS)
                     char temp[32] = {0};
                     sprintf(temp, "leveling_49.q%d.picc=170",showcount-1); 
-                    LCD_SERIAL.printf(temp);
-                    LCD_SERIAL.printf("\xff\xff\xff");
+                    LCD_SERIAL_2.printf(temp);
+                    LCD_SERIAL_2.printf("\xff\xff\xff");
 
-                    LCD_SERIAL.printf("leveling_49.tm0.en=1");
-                    LCD_SERIAL.printf("\xff\xff\xff");
+                    LCD_SERIAL_2.printf("leveling_49.tm0.en=1");
+                    LCD_SERIAL_2.printf("\xff\xff\xff");
                   #elif ENABLED(NEPTUNE_3_MAX)
                     char temp[32] = {0};
                     //sprintf(temp, "leveling_64.q%d.picc=173",showcount-1);
                     sprintf(temp, "leveling_63.q%d.picc=191",showcount-1);
-                    LCD_SERIAL.printf(temp);
-                    LCD_SERIAL.printf("\xff\xff\xff");
+                    LCD_SERIAL_2.printf(temp);
+                    LCD_SERIAL_2.printf("\xff\xff\xff");
 
-                    //LCD_SERIAL.printf("leveling_64.tm0.en=1");
-                    LCD_SERIAL.printf("leveling_63.tm0.en=1");
-                    LCD_SERIAL.printf("\xff\xff\xff");
+                    //LCD_SERIAL_2.printf("leveling_64.tm0.en=1");
+                    LCD_SERIAL_2.printf("leveling_63.tm0.en=1");
+                    LCD_SERIAL_2.printf("\xff\xff\xff");
                   #elif ENABLED(NEPTUNE_3_PRO)
                     char temp[32] = {0};
                     sprintf(temp, "leveling_36.q%d.picc=167",showcount-1); 
-                    LCD_SERIAL.printf(temp);
-                    LCD_SERIAL.printf("\xff\xff\xff");
+                    LCD_SERIAL_2.printf(temp);
+                    LCD_SERIAL_2.printf("\xff\xff\xff");
 
-                    LCD_SERIAL.printf("leveling_36.tm0.en=1");
-                    LCD_SERIAL.printf("\xff\xff\xff");
+                    LCD_SERIAL_2.printf("leveling_36.tm0.en=1");
+                    LCD_SERIAL_2.printf("\xff\xff\xff");
                   #endif                 
                 #endif
               }
@@ -842,21 +842,21 @@ G29_TYPE GcodeSuite::G29() {
                 #if ENABLED(NEPTUNE_3_PRO)
                   char temp[32] = {0};
                   sprintf(temp, "leveldata_36.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
-                  LCD_SERIAL.printf(temp);
-                  LCD_SERIAL.printf("\xff\xff\xff");
+                  LCD_SERIAL_2.printf(temp);
+                  LCD_SERIAL_2.printf("\xff\xff\xff");
                 #elif ENABLED(NEPTUNE_3_PLUS)
                   char temp[32] = {0};
                   //sprintf(temp, "leveldata_49.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
                   sprintf(temp, "aux49_data.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
-                  LCD_SERIAL.printf(temp);
-                  LCD_SERIAL.printf("\xff\xff\xff");
+                  LCD_SERIAL_2.printf(temp);
+                  LCD_SERIAL_2.printf("\xff\xff\xff");
                 #elif ENABLED(NEPTUNE_3_MAX)
                   //sprintf(temp, "leveldata_64.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
                   //sprintf(temp, "aux64_data.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
                   char temp[32] = {0};
                   sprintf(temp, "aux63_data.x%d.val=%d",showcount-1,(int)(abl.z_values[abl.meshCount.x][abl.meshCount.y]*100)); //显示数据
-                  LCD_SERIAL.printf(temp);
-                  LCD_SERIAL.printf("\xff\xff\xff");                 
+                  LCD_SERIAL_2.printf(temp);
+                  LCD_SERIAL_2.printf("\xff\xff\xff");                 
                 #endif
               #endif
 
