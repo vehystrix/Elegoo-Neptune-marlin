@@ -280,8 +280,8 @@ void Endstops::not_homing() {
     else {
       #if ENABLED(RTS_AVAILABLE)
         #if ENABLED(TJC_AVAILABLE)
-          LCD_SERIAL.printf("page err_homefail"); 
-          LCD_SERIAL.printf("\xff\xff\xff");
+          LCD_SERIAL_2.printf("page err_homefail"); 
+          LCD_SERIAL_2.printf("\xff\xff\xff");
         #endif
       #endif
       TERN_(SOVOL_SV06_RTS, rts.gotoPageBeep(ID_KillHome_L, ID_KillHome_D));

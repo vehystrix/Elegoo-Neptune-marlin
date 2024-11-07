@@ -1853,6 +1853,7 @@
                           || (defined(SERIAL_PORT_3)     && N == SERIAL_PORT_3) \
                           || (defined(MMU_SERIAL_PORT)   && N == MMU_SERIAL_PORT) \
                           || (defined(LCD_SERIAL_PORT)   && N == LCD_SERIAL_PORT) \
+                          || (defined(LCD_SERIAL_PORT_2)   && N == LCD_SERIAL_PORT_2) \
                           || (defined(RS485_SERIAL_PORT) && N == RS485_SERIAL_PORT) )
 
 // Flag the named hardware serial ports in use

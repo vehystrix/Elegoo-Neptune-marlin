@@ -869,8 +869,8 @@ void CardReader::write_command(char * const buf) {
 
   if (file.writeError) {
     #if ENABLED(TJC_AVAILABLE)  
-      LCD_SERIAL.printf("page err_sdwrite");
-      LCD_SERIAL.printf("\xff\xff\xff");
+      LCD_SERIAL_2.printf("page err_sdwrite");
+      LCD_SERIAL_2.printf("\xff\xff\xff");
     #endif
     SERIAL_ERROR_MSG(STR_SD_ERR_WRITE_TO_FILE);
   }

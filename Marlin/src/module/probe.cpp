@@ -1036,8 +1036,8 @@ float Probe::probe_at_point(
       // This would also benefit from the contemplated "Audio Alerts" feature.
       stow();
       #if ENABLED(TJC_AVAILABLE)
-        LCD_SERIAL.printf("page err_probefail");
-        LCD_SERIAL.printf("\xff\xff\xff");
+        LCD_SERIAL_2.printf("page err_probefail");
+        LCD_SERIAL_2.printf("\xff\xff\xff");
         showcount = 0;
       #endif
       LCD_MESSAGE(MSG_LCD_PROBING_FAILED);

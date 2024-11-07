@@ -3740,13 +3740,13 @@ void MarlinSettings::reset() {
       #if ENABLED(POWER_LOSS_RECOVERY)
         if(recovery.enabled==0)
         { 
-          LCD_SERIAL.printf("plrbutton.val=0");
-          LCD_SERIAL.printf("\xff\xff\xff"); 
+          LCD_SERIAL_2.printf("plrbutton.val=0");
+          LCD_SERIAL_2.printf("\xff\xff\xff"); 
         }
         else if(recovery.enabled==1)
         {
-          LCD_SERIAL.printf("plrbutton.val=1");
-          LCD_SERIAL.printf("\xff\xff\xff"); 
+          LCD_SERIAL_2.printf("plrbutton.val=1");
+          LCD_SERIAL_2.printf("\xff\xff\xff"); 
         }
       #endif           
     #endif

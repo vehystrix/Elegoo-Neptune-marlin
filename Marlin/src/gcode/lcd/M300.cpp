@@ -44,8 +44,8 @@ void GcodeSuite::M300() {
     char temp[16];
     memset(temp,0,sizeof(temp));
     sprintf(temp, "beep %d", duration); 
-    LCD_SERIAL.printf(temp);
-    LCD_SERIAL.printf("\xff\xff\xff");
+    LCD_SERIAL_2.printf(temp);
+    LCD_SERIAL_2.printf("\xff\xff\xff");
   #else
 
   #if ENABLED(SOUND_MENU_ITEM)
