@@ -160,19 +160,19 @@
 
 #define HEATER_0_PIN                MOSFET_A_PIN
 
-#if FET_ORDER_EFB                                 // Hotend, Fan, Bed
+#if ENABLED(FET_ORDER_EFB)                        // Hotend, Fan, Bed
   #define FAN0_PIN                  MOSFET_B_PIN
   #define HEATER_BED_PIN            MOSFET_C_PIN
-#elif FET_ORDER_EEF                               // Hotend, Hotend, Fan
+#elif ENABLED(FET_ORDER_EEF)                      // Hotend, Hotend, Fan
   #define HEATER_1_PIN              MOSFET_B_PIN
   #define FAN0_PIN                  MOSFET_C_PIN
-#elif FET_ORDER_EEB                               // Hotend, Hotend, Bed
+#elif ENABLED(FET_ORDER_EEB)                      // Hotend, Hotend, Bed
   #define HEATER_1_PIN              MOSFET_B_PIN
   #define HEATER_BED_PIN            MOSFET_C_PIN
-#elif FET_ORDER_EFF                               // Hotend, Fan, Fan
+#elif ENABLED(FET_ORDER_EFF)                      // Hotend, Fan, Fan
   #define FAN0_PIN                  MOSFET_B_PIN
   #define FAN1_PIN                  MOSFET_C_PIN
-#elif FET_ORDER_SF                                // Spindle, Fan
+#elif ENABLED(FET_ORDER_SF)                       // Spindle, Fan
   #define FAN0_PIN                  MOSFET_C_PIN
 #else                                             // Non-specific are "EFB" (i.e., "EFBF" or "EFBE")
   #define FAN0_PIN                  MOSFET_B_PIN
