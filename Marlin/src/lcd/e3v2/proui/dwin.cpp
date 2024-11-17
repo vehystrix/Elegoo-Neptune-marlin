@@ -2672,7 +2672,7 @@ void applyMaxAccel() { planner.set_max_acceleration(hmiValue.axis, menuData.valu
       default: break;
     }
   }
-  void applyHomingFR() { updateHomingFR(HMI_value.axis, MenuData.Value); }
+  void applyHomingFR() { updateHomingFR(hmiValue.axis, menuData.value); }
   #if HAS_X_AXIS
     void setHomingX() { hmiValue.axis = X_AXIS; setIntOnClick(min_homing_edit_values.x, max_homing_edit_values.x, homing_feedrate_mm_m.x, applyHomingFR); }
   #endif
@@ -3799,15 +3799,15 @@ void drawMaxAccelMenu() {
     if (SET_MENU(homingFRMenu, MSG_HOMING_FEEDRATE, 4)) {
       BACK_ITEM(drawMotionMenu);
       #if HAS_X_AXIS
-        static uint16_t xhome = static_cast<uint16_t>(homing_feedrate_mm_m.x);
+        uint16_t xhome = static_cast<uint16_t>(homing_feedrate_mm_m.x);
         EDIT_ITEM(ICON_MaxSpeedJerkX, MSG_HOMING_FEEDRATE_X, onDrawPIntMenu, setHomingX, &xhome);
       #endif
       #if HAS_Y_AXIS
-        static uint16_t yhome = static_cast<uint16_t>(homing_feedrate_mm_m.y);
+        uint16_t yhome = static_cast<uint16_t>(homing_feedrate_mm_m.y);
         EDIT_ITEM(ICON_MaxSpeedJerkY, MSG_HOMING_FEEDRATE_Y, onDrawPIntMenu, setHomingY, &yhome);
       #endif
       #if HAS_Z_AXIS
-        static uint16_t zhome = static_cast<uint16_t>(homing_feedrate_mm_m.z);
+        uint16_t zhome = static_cast<uint16_t>(homing_feedrate_mm_m.z);
         EDIT_ITEM(ICON_MaxSpeedJerkZ, MSG_HOMING_FEEDRATE_Z, onDrawPIntMenu, setHomingZ, &zhome);
       #endif
     }

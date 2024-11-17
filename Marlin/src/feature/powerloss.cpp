@@ -99,7 +99,7 @@ PrintJobRecovery recovery;
 /**
  * Clear the recovery info
  */
-void PrintJobRecovery::init() { memset(&info, 0, sizeof(info)); }
+void PrintJobRecovery::init() { info = {}; }
 
 /**
  * Enable or disable then call changed()
