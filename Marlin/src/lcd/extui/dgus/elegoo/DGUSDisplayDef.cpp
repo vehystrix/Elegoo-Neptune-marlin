@@ -5580,8 +5580,6 @@
             RTS_SndData(ExchangePageBase + 38, ExchangepageAddr);
             queue.enqueue_now_P(PSTR("G29"));
             planner.synchronize();
-            queue.enqueue_now_P(PSTR("M500"));
-            planner.synchronize();
           #endif
         }
         else if (recdat.data[0] == 10) //更新PRINTPAUSE上的一些信息 0x0A
