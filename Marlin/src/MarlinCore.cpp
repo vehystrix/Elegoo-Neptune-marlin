@@ -1284,7 +1284,7 @@ void setup() {
     SETUP_RUN(runout.setup());
   #endif
 
-  #if HAS_TMC220x
+  #if HAS_TMC_UART
     SETUP_RUN(tmc_serial_begin());
   #endif
 
