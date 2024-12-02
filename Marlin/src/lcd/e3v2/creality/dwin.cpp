@@ -51,8 +51,6 @@
 #include "../../../sd/cardreader.h"
 
 #include "../../../MarlinCore.h"
-#include "../../../core/serial.h"
-#include "../../../core/macros.h"
 #include "../../../gcode/queue.h"
 
 #include "../../../module/temperature.h"

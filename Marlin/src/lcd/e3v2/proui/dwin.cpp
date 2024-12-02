@@ -40,8 +40,6 @@
 #include "../../marlinui.h"
 #include "../../extui/ui_api.h"
 #include "../../../MarlinCore.h"
-#include "../../../core/serial.h"
-#include "../../../core/macros.h"
 #include "../../../module/temperature.h"
 #include "../../../module/printcounter.h"
 #include "../../../module/motion.h"
