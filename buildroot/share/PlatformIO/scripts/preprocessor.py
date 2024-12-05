@@ -87,7 +87,7 @@ def search_compiler(env):
         if ppath.match(env['PROJECT_PACKAGES_DIR'] + "/**/bin"):
             for gpath in ppath.glob(gcc_exe):
                 # Skip '*-elf-g++' (crosstool-NG) except for xtensa32
-                if not "xtensa32" not in str(gpath) and gpath.stem.endswith('-elf-g++'):
+                if not (("xtensa32" not in str(gpath)) and gpath.stem.endswith('-elf-g++')):
                     gccpath = str(gpath.resolve())
                     break
 
