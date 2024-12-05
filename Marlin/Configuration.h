@@ -76,9 +76,11 @@
   #if ENABLED(RTS_AVAILABLE)
     #define NO_AUTO_ASSIGN_WARNING  // suppress warning for auto-assigning LCD serial port
     
-    //#define NEPTUNE_3_PRO      1
-    #define NEPTUNE_3_PLUS   1
-    //#define NEPTUNE_3_MAX    1
+    #if NONE(NEPTUNE_3_PRO, NEPTUNE_3_PLUS, NEPTUNE_3_MAX)
+      //#define NEPTUNE_3_PRO      1
+      #define NEPTUNE_3_PLUS   1
+      //#define NEPTUNE_3_MAX    1
+    #endif
   #endif
 #endif
 
@@ -577,7 +579,9 @@
  *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  */
+#ifndef TEMP_SENSOR_0
 #define TEMP_SENSOR_0 1
+#endif
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -661,7 +665,9 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
+#ifndef HEATER_0_MAXTEMP
 #define HEATER_0_MAXTEMP 275
+#endif
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
