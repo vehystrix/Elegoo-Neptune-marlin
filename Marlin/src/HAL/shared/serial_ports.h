@@ -156,6 +156,21 @@
   #endif
 #endif
 
+#ifdef LCD_SERIAL_PORT_2
+  #if WITHIN(LCD_SERIAL_PORT_2, SERIAL_INDEX_MIN, SERIAL_INDEX_MAX)
+    #define LCD_SERIAL_2 MSERIAL(LCD_SERIAL_PORT_2)
+    #ifdef DECLARE_SERIAL
+      DECLARE_SERIAL(LCD_SERIAL_PORT_2);
+    #endif
+  #else
+    static_assert(false, "LCD_SERIAL_PORT_2" INDEX_RANGE_MSG ".");
+    #define LCD_SERIAL_2 _MSERIAL(1) // Dummy port
+  #endif
+  #if ANY(HAS_DGUS_LCD, EXTENSIBLE_UI)
+    #define SERIAL2_GET_TX_BUFFER_FREE() LCD_SERIAL_2.availableForWrite()
+  #endif
+#endif
+
 //
 // RS485_SERIAL_PORT => RS485_SERIAL
 //
