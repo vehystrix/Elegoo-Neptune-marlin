@@ -63,6 +63,10 @@
   #include "../../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
 #endif
 
+#if DISABLED(PROBE_MANUALLY) && FT_MOTION_DISABLE_FOR_PROBING
+  #include "../../../module/ft_motion.h"
+#endif
+
 #if ABL_USES_GRID
   #if ENABLED(PROBE_Y_FIRST)
     #define PR_OUTER_VAR  abl.meshCount.x
@@ -288,12 +292,21 @@ G29_TYPE GcodeSuite::G29() {
   // Set and report "probing" state to host
   TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_PROBE, false));
 
+  #if DISABLED(PROBE_MANUALLY) && FT_MOTION_DISABLE_FOR_PROBING
+    FTMotionDisableInScope FT_Disabler; // Disable Fixed-Time Motion for probing
+  #endif
+
   /**
    * On the initial G29 fetch command parameters.
    */
   if (!g29_in_progress) {
 
     probe.use_probing_tool();
+
+    #ifdef EVENT_GCODE_BEFORE_G29
+      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Before G29 G-code: ", EVENT_GCODE_BEFORE_G29);
+      gcode.process_subcommands_now(F(EVENT_GCODE_BEFORE_G29));
+    #endif
 
     #if ANY(PROBE_MANUALLY, AUTO_BED_LEVELING_LINEAR)
       abl.abl_probe_index = -1;
@@ -400,7 +413,12 @@ G29_TYPE GcodeSuite::G29() {
 
     #if ABL_USES_GRID
 
+      constexpr feedRate_t min_probe_feedrate_mm_s = XY_PROBE_FEEDRATE_MIN;
       xy_probe_feedrate_mm_s = MMM_TO_MMS(parser.linearval('S', XY_PROBE_FEEDRATE));
+      if (xy_probe_feedrate_mm_s < min_probe_feedrate_mm_s) {
+        xy_probe_feedrate_mm_s = min_probe_feedrate_mm_s;
+        SERIAL_ECHOLNPGM(GCODE_ERR_MSG("Feedrate (S) too low. (Using ", min_probe_feedrate_mm_s, ")"));
+      }
 
       const float x_min = probe.min_x(), x_max = probe.max_x(),
                   y_min = probe.min_y(), y_max = probe.max_y();
@@ -699,7 +717,7 @@ G29_TYPE GcodeSuite::G29() {
           inInc = -1;                   // Zag left
         }
 
-        zig ^= true; // zag
+        FLIP(zig); // zag
 
         // An index to print current state
         grid_count_t pt_index = (PR_OUTER_VAR) * (PR_INNER_SIZE) + 1;
@@ -1083,7 +1101,7 @@ G29_TYPE GcodeSuite::G29() {
   TERN_(HAS_BED_PROBE, probe.move_z_after_probing());
 
   #ifdef EVENT_GCODE_AFTER_G29
-    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Z Probe End Script: ", EVENT_GCODE_AFTER_G29);
+    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("After G29 G-code: ", EVENT_GCODE_AFTER_G29);
     planner.synchronize();
     process_subcommands_now(F(EVENT_GCODE_AFTER_G29));
   #endif
