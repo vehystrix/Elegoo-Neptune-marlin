@@ -8169,6 +8169,33 @@
     }
   }
 
+namespace ExtUI {
+  void onPrintTimerStarted() {
+  #if ENABLED(TJC_AVAILABLE)
+    LCD_SERIAL_2.printf("page printpause"); 
+    LCD_SERIAL_2.printf("\xff\xff\xff");  
+    restFlag1 = 0;
+    LCD_SERIAL_2.printf("restFlag1=0");  //9999----打印界面显示：1-恢复按钮 0-暂停按钮
+    LCD_SERIAL_2.printf("\xff\xff\xff");
+  #endif
+  }
+  void onPrintTimerPaused() {
+  #if ENABLED(TJC_AVAILABLE)
+    restFlag1 = 1;//9999----打印界面显示：同时判断restFlag1 = 1  restFlag2 = 0      1-恢复按钮 0-暂停按钮
+    restFlag2 = 0;
+    LCD_SERIAL_2.printf("restFlag1=1");
+    LCD_SERIAL_2.printf("\xff\xff\xff");
+    LCD_SERIAL_2.printf("restFlag2=0");
+    LCD_SERIAL_2.printf("\xff\xff\xff");
+  #endif
+  }
+  void onPrintTimerStopped() {
+  #if ENABLED(TJC_AVAILABLE)
+    LCD_SERIAL_2.printf("page main"); 
+    LCD_SERIAL_2.printf("\xff\xff\xff");  
+  #endif
+  }
+}
 
 #endif
 

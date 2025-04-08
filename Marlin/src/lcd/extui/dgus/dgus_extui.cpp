@@ -62,9 +62,11 @@ namespace ExtUI {
   void onMaxTempError(const heater_id_t header_id) {}
 
   void onPlayTone(const uint16_t frequency, const uint16_t duration/*=0*/) {}
+#if DISABLED(RTS_AVAILABLE)
   void onPrintTimerStarted() {}
   void onPrintTimerPaused() {}
   void onPrintTimerStopped() {}
+#endif
   void onFilamentRunout(const extruder_t extruder) {}
 
   void onUserConfirmRequired(const char * const msg) {

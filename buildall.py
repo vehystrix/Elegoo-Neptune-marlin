@@ -26,6 +26,8 @@ def build(model: str, temp: int):
     os.replace(builddir / 'ZNP_ROBIN_NANO.bin', outdir / f"{model}_{tempname}ZNP_ROBIN_NANO.bin")
 # def build
 
+os.system('platformio run --target clean -e MKS_E3_V2')
+
 for model in MODELS:
     for temp in [260, 300, 320, 350]:
         build(model, temp)

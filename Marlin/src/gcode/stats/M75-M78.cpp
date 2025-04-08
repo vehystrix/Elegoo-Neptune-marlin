@@ -29,11 +29,6 @@
 
 #include "../../MarlinCore.h" // for startOrResumeJob
 
-#if ENABLED(TJC_AVAILABLE)
-  #include "../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
-  #include "../../gcode/queue.h"
-#endif
-
 #if ENABLED(DWIN_LCD_PROUI)
   #include "../../lcd/e3v2/proui/dwin.h"
 #endif
@@ -46,15 +41,6 @@
  */
 void GcodeSuite::M75() {
   startOrResumeJob(); // ... ExtUI::onPrintTimerStarted()
-
-  #if ENABLED(TJC_AVAILABLE)
-    LCD_SERIAL_2.printf("page printpause"); 
-    LCD_SERIAL_2.printf("\xff\xff\xff");  
-    restFlag1 = 0;
-    LCD_SERIAL_2.printf("restFlag1=0");  //9999----打印界面显示：1-恢复按钮 0-暂停按钮
-    LCD_SERIAL_2.printf("\xff\xff\xff");
-  #endif
-
   #if ENABLED(DWIN_LCD_PROUI)
     // TODO: Remove if M75 <string> is never used
     if (!IS_SD_PRINTING()) dwinPrintHeader(parser.has_string() ? parser.string_arg : GET_TEXT(MSG_HOST_START_PRINT));
@@ -65,16 +51,6 @@ void GcodeSuite::M75() {
  * M76: Pause print timer
  */
 void GcodeSuite::M76() {
-  #if ENABLED(TJC_AVAILABLE)
-    restFlag1 = 1;//9999----打印界面显示：同时判断restFlag1 = 1  restFlag2 = 0      1-恢复按钮 0-暂停按钮
-    restFlag2 = 0;
-    LCD_SERIAL_2.printf("restFlag1=1");
-    LCD_SERIAL_2.printf("\xff\xff\xff");
-    LCD_SERIAL_2.printf("restFlag2=0");
-    LCD_SERIAL_2.printf("\xff\xff\xff");
-  #endif
-
-
   print_job_timer.pause(); // ... ExtUI::onPrintTimerPaused()
   TERN_(HOST_PAUSE_M76, hostui.pause());
 }
@@ -83,11 +59,6 @@ void GcodeSuite::M76() {
  * M77: Stop print timer
  */
 void GcodeSuite::M77() {
-  #if ENABLED(TJC_AVAILABLE)
-    LCD_SERIAL_2.printf("page main"); 
-    LCD_SERIAL_2.printf("\xff\xff\xff");  
-  #endif
-
   print_job_timer.stop();
 }
 
