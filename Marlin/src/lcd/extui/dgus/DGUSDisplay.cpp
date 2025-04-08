@@ -48,7 +48,7 @@
 
 DGUSDisplay dgus;
 
-#ifdef DEBUG_DGUS_COMM
+#if ENABLED(DEBUG_DGUS_COMM)
   #define DEBUGLCDCOMM_ECHOPGM DEBUG_ECHOPGM
 #else
   #define DEBUGLCDCOMM_ECHOPGM(...) NOOP
@@ -83,7 +83,22 @@ void DGUSDisplay::initDisplay() {
   #endif
 }
 
-void DGUSDisplay::writeVariable(uint16_t adr, const void *values, uint8_t valueslen, bool isstr) {
+void DGUSDisplay::writeVariable_P(uint16_t adr, const void *values, uint8_t valueslen, bool isstr/*=false*/) {
+  const char* myvalues = static_cast<const char*>(values);
+  bool strend = !myvalues;
+  writeHeader(adr, DGUS_CMD_WRITEVAR, valueslen);
+  while (valueslen--) {
+    char x;
+    if (!strend) x = pgm_read_byte(myvalues++);
+    if ((isstr && !x) || strend) {
+      strend = true;
+      x = ' ';
+    }
+    LCD_SERIAL.write(x);
+  }
+}
+
+void DGUSDisplay::writeVariable(uint16_t adr, const void *values, uint8_t valueslen, bool isstr/*=false*/) {
   const char* myvalues = static_cast<const char*>(values);
   bool strend = !myvalues;
   writeHeader(adr, DGUS_CMD_WRITEVAR, valueslen);
@@ -125,21 +140,6 @@ void DGUSDisplay::writeVariable(uint16_t adr, long value) {
   tmp[2] = endian.lb[1];
   tmp[3] = endian.lb[0];
   writeVariable(adr, static_cast<const void*>(&tmp), sizeof(long));
-}
-
-void DGUSDisplay::writeVariablePGM(uint16_t adr, const void *values, uint8_t valueslen, bool isstr) {
-  const char* myvalues = static_cast<const char*>(values);
-  bool strend = !myvalues;
-  writeHeader(adr, DGUS_CMD_WRITEVAR, valueslen);
-  while (valueslen--) {
-    char x;
-    if (!strend) x = pgm_read_byte(myvalues++);
-    if ((isstr && !x) || strend) {
-      strend = true;
-      x = ' ';
-    }
-    LCD_SERIAL.write(x);
-  }
 }
 
 #if ENABLED(RTS_AVAILABLE)

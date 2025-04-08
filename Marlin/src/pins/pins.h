@@ -786,13 +786,13 @@
 #elif MB(LERDGE_X)
   #include "stm32f4/pins_LERDGE_X.h"                // STM32F4                              env:LERDGEX env:LERDGEX_usb_flash_drive
 #elif MB(FYSETC_S6)
-  #include "stm32f4/pins_FYSETC_S6.h"               // STM32F4                              env:FYSETC_S6 env:FYSETC_S6_8000
+  #include "stm32f4/pins_FYSETC_S6.h"               // STM32F4                              env:STM32F446VE_fysetc env:STM32F446VE_fysetc_32k_bootloader
 #elif MB(FYSETC_S6_V2_0)
-  #include "stm32f4/pins_FYSETC_S6_V2_0.h"          // STM32F4                              env:FYSETC_S6 env:FYSETC_S6_8000
+  #include "stm32f4/pins_FYSETC_S6_V2_0.h"          // STM32F4                              env:STM32F446VE_fysetc env:STM32F446VE_fysetc_32k_bootloader
 #elif MB(FYSETC_SPIDER)
-  #include "stm32f4/pins_FYSETC_SPIDER.h"           // STM32F4                              env:FYSETC_S6 env:FYSETC_S6_8000
+  #include "stm32f4/pins_FYSETC_SPIDER.h"           // STM32F4                              env:STM32F446VE_fysetc env:STM32F446VE_fysetc_32k_bootloader
 #elif MB(FYSETC_SPIDER_V2_2)
-  #include "stm32f4/pins_FYSETC_SPIDER_V2_2.h"      // STM32F4                              env:FYSETC_S6 env:FYSETC_S6_8000
+  #include "stm32f4/pins_FYSETC_SPIDER_V2_2.h"      // STM32F4                              env:STM32F446VE_fysetc_32k_bootloader
 #elif MB(FLYF407ZG)
   #include "stm32f4/pins_FLYF407ZG.h"               // STM32F4                              env:FLYF407ZG
 #elif MB(MKS_ROBIN2)
@@ -967,6 +967,20 @@
   #include "hc32f4/pins_CREALITY_ENDER2P_V24S4.h"   // HC32F460                             env:HC32F460C_e2p24s4
 
 //
+// GD32 ARM Cortex-M3
+//
+
+#elif MB(AQUILA_V101_GD32_MFL)
+  #include "gd32f1/pins_AQUILA_101_GD32_MFL.h"      // GD32F103RC                           env:GD32F103RC_aquila_mfl
+
+//
+// GD32 ARM Cortex-M4
+//
+
+#elif MB(CREALITY_V422_GD32_MFL)
+  #include "gd32f3/pins_CREALITY_V422_GD32_MFL.h"   // GD32F303RE                           env:GD32F303RE_creality_mfl
+
+//
 // Raspberry Pi RP2040
 //
 
@@ -987,7 +1001,7 @@
 //
 
 #elif MB(SIMULATED)
-  #include "native/pins_RAMPS_NATIVE.h"             // Native or Simulation                 lin:linux_native mac:simulator_macos_debug mac:simulator_macos_release win:simulator_windows lin:simulator_linux_debug lin:simulator_linux_release
+  #include "native/pins_RAMPS_NATIVE.h"             // Native or Simulation                 lin:linux_native lin:simulator_linux_debug lin:simulator_linux_release lin:linux_native_test mac:simulator_macos_debug mac:simulator_macos_release win:simulator_windows
 
 #else
 
