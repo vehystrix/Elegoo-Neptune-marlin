@@ -5580,6 +5580,11 @@
             RTS_SndData(ExchangePageBase + 38, ExchangepageAddr);
             queue.enqueue_now_P(PSTR("G29"));
             planner.synchronize();
+            // Move to 0.1mm from the bed, to offset the 5mm from EVENT_GCODE_AFTER_G29
+            // See also
+            // https://github.com/vehystrix/Elegoo-Neptune-marlin/issues/2
+            // https://github.com/vehystrix/Elegoo-Neptune-marlin/issues/5
+            queue.enqueue_now_P(PSTR("G28 Z\nG1 F200 Z0.1"));
           #endif
         }
         else if (recdat.data[0] == 10) //更新PRINTPAUSE上的一些信息 0x0A
