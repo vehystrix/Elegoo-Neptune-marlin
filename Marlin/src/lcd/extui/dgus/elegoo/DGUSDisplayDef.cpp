@@ -1689,11 +1689,11 @@
             rtscheck.RTS_SndData((elapsed.value % 3600) / 60, PRINT_TIME_MIN_VP);
           #endif
 
-          if(card.isPrinting() && (last_cardpercentValue != card.percentDone()))
+          if(printJobOngoing() && (last_cardpercentValue != ui.get_progress_percent()))
           {
-            if((unsigned char) card.percentDone() >= 0)
+            if((unsigned char) ui.get_progress_percent() >= 0)
             {
-              Percentrecord = card.percentDone();
+              Percentrecord = ui.get_progress_percent();
               if(Percentrecord <= 100)
               {
                 #if ENABLED(RTS_AVAILABLE) 
@@ -1739,10 +1739,10 @@
               #endif
             }
 
-            last_cardpercentValue = card.percentDone();
+            last_cardpercentValue = ui.get_progress_percent();
 
             #if ENABLED(RTS_AVAILABLE) 
-              rtscheck.RTS_SndData((unsigned char)card.percentDone(), PRINT_PROCESS_VP);
+              rtscheck.RTS_SndData((unsigned char)ui.get_progress_percent(), PRINT_PROCESS_VP);
               rtscheck.RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
             #endif 
           }
@@ -5609,11 +5609,11 @@
           #endif
 
           //printpercent
-          if(card.isPrinting() && (last_cardpercentValue != card.percentDone()))
+          if(printJobOngoing() && (last_cardpercentValue != ui.get_progress_percent()))
           {
-            if((unsigned char) card.percentDone() >= 0)
+            if((unsigned char) ui.get_progress_percent() >= 0)
             {
-              Percentrecord = card.percentDone();
+              Percentrecord = ui.get_progress_percent();
               if(Percentrecord <= 100)
               {
                 #if ENABLED(RTS_AVAILABLE) 
@@ -5648,8 +5648,8 @@
               #endif
             }
 
-            last_cardpercentValue = card.percentDone();
-          }          
+            last_cardpercentValue = ui.get_progress_percent();
+          }
         }
         else if(recdat.data[0] == 11)  //0x0B
         {
@@ -5917,7 +5917,7 @@
           LCD_SERIAL_2.printf("\xff\xff\xff");
 
           //打印百分比
-          Percentrecord = card.percentDone();
+          Percentrecord = ui.get_progress_percent();
           if(Percentrecord <= 100)
           {
             #if ENABLED(RTS_AVAILABLE) 
@@ -7955,12 +7955,12 @@
           RTS_SndData(0, HEAD1_FAN_ICON_VP);
         }
         #endif
-        Percentrecord = card.percentDone() + 1;
+        Percentrecord = ui.get_progress_percent() + 1;
         if (Percentrecord <= 100)
         {
           rtscheck.RTS_SndData((unsigned char)Percentrecord, PRINT_PROCESS_ICON_VP);
         }
-        rtscheck.RTS_SndData((unsigned char)card.percentDone(), PRINT_PROCESS_VP);
+        rtscheck.RTS_SndData((unsigned char)ui.get_progress_percent(), PRINT_PROCESS_VP);
 
         RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
         #if ENABLED(TJC_AVAILABLE) 
