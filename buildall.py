@@ -21,12 +21,12 @@ def build(model: str, temp: int):
         if temp > 290: temp_define += ' -DTEMP_SENSOR_0=61'
     # if
 
+    os.system('platformio run --target clean -e MKS_E3_V2')
     os.environ['PLATFORMIO_BUILD_FLAGS'] = f"-DNEPTUNE_3_{model}=1" + temp_define
     os.system('platformio run -e MKS_E3_V2')
     os.replace(builddir / 'ZNP_ROBIN_NANO.bin', outdir / f"{model}_{tempname}ZNP_ROBIN_NANO.bin")
 # def build
 
-os.system('platformio run --target clean -e MKS_E3_V2')
 
 for model in MODELS:
     for temp in [260, 300, 320, 350]:
