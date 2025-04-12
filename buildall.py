@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 
 import os
+from datetime import date
 from pathlib import Path
 
 builddir = Path(os.path.dirname(os.path.realpath(__file__))) / '.pio' / 'build' / 'MKS_E3_V2'
 outdir = Path.cwd() / 'build'
 outdir.mkdir(parents=True, exist_ok=True)
+
+softversion_define = f" -DSOFTVERSION=\\\"{date.today().strftime('%y%m%d')}\\\""
 
 MODELS = ['PRO', 'PLUS', 'MAX']
 
@@ -22,7 +25,7 @@ def build(model: str, temp: int):
     # if
 
     os.system('platformio run --target clean -e MKS_E3_V2')
-    os.environ['PLATFORMIO_BUILD_FLAGS'] = f"-DNEPTUNE_3_{model}=1" + temp_define
+    os.environ['PLATFORMIO_BUILD_FLAGS'] = f"-DNEPTUNE_3_{model}=1" + temp_define + softversion_define
     os.system('platformio run -e MKS_E3_V2')
     os.replace(builddir / 'ZNP_ROBIN_NANO.bin', outdir / f"{model}_{tempname}ZNP_ROBIN_NANO.bin")
 # def build

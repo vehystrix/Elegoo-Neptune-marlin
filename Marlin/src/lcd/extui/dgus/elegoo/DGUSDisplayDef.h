@@ -391,7 +391,9 @@
   
   #define CORP_WEBSITE            "www.elegoo.com"
 
+  #ifndef SOFTVERSION
   #define SOFTVERSION             "bugfix-2.1.x"
+  #endif
 
   #if ENABLED(SDSUPPORT)
     #include "../../../../sd/SdFile.h"
