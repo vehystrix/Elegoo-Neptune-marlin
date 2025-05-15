@@ -678,7 +678,7 @@
         }
       }
 
-      lcd_sd_status = IS_SD_INSERTED();
+      lcd_sd_status = card.isInserted();
     }
     else
     {
@@ -782,7 +782,7 @@
     static bool flag_stable;
     static uint32_t stable_point_time;
 
-    bool tmp = IS_SD_INSERTED();
+    bool tmp = card.isInserted();
 
     if(tmp != last)
     {
@@ -2049,7 +2049,7 @@
     
     rtscheck.RTS_SDCardUpate(); // Check the status of card
 
-    if( (enable_filment_check || RTS_M600_Flag)  && IS_SD_PRINTING())
+    if( (enable_filment_check || RTS_M600_Flag)  && card.isStillPrinting())
     {
       #if ENABLED(CHECKFILEMENT)
          
@@ -3023,7 +3023,7 @@
         }
         else if(recdat.data[0] == 0x01)
         {
-          if(IS_SD_PRINTING())
+          if(card.isStillPrinting())
           {
             #if ENABLED(TJC_AVAILABLE)
               LCD_SERIAL_2.printf("page pauseconfirm");
@@ -7918,7 +7918,7 @@
         RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], PRINT_FILE_TEXT_VP);
 
         // represents to update file list
-        if (CardUpdate && lcd_sd_status && IS_SD_INSERTED())
+        if (CardUpdate && lcd_sd_status && card.isInserted())
         {
           for (uint16_t i = 0; i < CardRecbuf.Filesum; i++)
           {

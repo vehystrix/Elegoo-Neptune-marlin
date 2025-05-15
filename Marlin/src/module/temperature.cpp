@@ -4913,7 +4913,7 @@ void Temperature::isr() {
         TERN_(PRINTER_EVENT_LEDS, printerEventLEDs.onHeatingDone());
 
         #if ENABLED(RTS_AVAILABLE)
-          if((printJobOngoing() && IS_SD_PRINTING()) || (printJobOngoing() && PoweroffContinue) )
+          if((printJobOngoing() && card.isStillPrinting()) || (printJobOngoing() && PoweroffContinue) )
           //if(printJobOngoing())
           {
             rtscheck.RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
