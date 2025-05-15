@@ -643,12 +643,12 @@ namespace ExtUI {
 
   #if ENABLED(LIN_ADVANCE)
     float getLinearAdvance_mm_mm_s(const extruder_t extruder) {
-      return (extruder < EXTRUDERS) ? planner.extruder_advance_K[E_INDEX_N(extruder - E0)] : 0;
+      return (extruder < EXTRUDERS) ? planner.get_advance_k(E_INDEX_N(extruder - E0)) : 0;
     }
 
     void setLinearAdvance_mm_mm_s(const_float_t value, const extruder_t extruder) {
       if (extruder < EXTRUDERS)
-        planner.extruder_advance_K[E_INDEX_N(extruder - E0)] = constrain(value, 0, 10);
+        planner.set_advance_k(constrain(value, 0, 10), E_INDEX_N(extruder - E0));
     }
   #endif
 
@@ -1064,11 +1064,8 @@ namespace ExtUI {
     TERN(HAS_MEDIA, card.openAndPrintFile(filename), UNUSED(filename));
   }
 
-  bool isPrintingFromMediaPaused() {
-    return IS_SD_PAUSED();
-  }
-
-  bool isPrintingFromMedia() { return IS_SD_PRINTING() || IS_SD_PAUSED(); }
+  bool isPrintingFromMedia() { return card.isStillPrinting() || card.isPaused(); }
+  bool isPrintingFromMediaPaused() { return card.isPaused(); }
 
   bool isPrinting() {
     return commandsInQueue() || isPrintingFromMedia() || printJobOngoing() || printingIsPaused();
@@ -1082,7 +1079,9 @@ namespace ExtUI {
     return isPrintingFromMedia() || printJobOngoing();
   }
 
-  bool isMediaMounted() { return TERN0(HAS_MEDIA, card.isMounted()); }
+  bool isMediaMounted()    { return card.isMounted(); }
+  bool isMediaMountedSD()  { return card.isSDCardMounted(); }
+  bool isMediaMountedUSB() { return card.isFlashDriveMounted(); }
 
   // Pause/Resume/Stop are implemented in MarlinUI
   void pausePrint()  { ui.pause_print(); }

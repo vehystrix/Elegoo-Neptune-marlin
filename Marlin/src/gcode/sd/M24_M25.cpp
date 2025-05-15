@@ -108,7 +108,7 @@ void GcodeSuite::M24() {
 namespace {
   inline void do_M25() {
     // Set initial pause flag to prevent more commands from landing in the queue while we try to pause
-    if (IS_SD_PRINTING()) card.pauseSDPrint();
+    if (card.isStillPrinting()) card.pauseSDPrint();
 
     #if ENABLED(POWER_LOSS_RECOVERY) && DISABLED(DGUS_LCD_UI_MKS)
       if (recovery.enabled) recovery.save(true);
