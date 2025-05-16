@@ -42,6 +42,7 @@
 // Check the integrity of data offsets.
 // Can be disabled for production build.
 //#define DEBUG_EEPROM_READWRITE
+//#define DEBUG_EEPROM_READWRITE_EXTRA
 //#define DEBUG_EEPROM_OBSERVE
 
 #include "settings.h"
@@ -904,6 +905,14 @@ void MarlinSettings::postprocess() {
    * M500 - Store Configuration
    */
   bool MarlinSettings::save() {
+    #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+      #define EEPROM_WRITE(val) \
+      do { \
+        SERIAL_ECHOLNPGM("Writing field: " STRINGIFY(val)); \
+        EEPROM_WRITE(val); \
+      } while (0)
+    #endif
+
     float dummyf = 0;
 
     if (!EEPROM_START(EEPROM_OFFSET)) return false;
@@ -1902,6 +1911,9 @@ void MarlinSettings::postprocess() {
     TERN_(EXTENSIBLE_UI, ExtUI::onSettingsStored(success));
 
     return success;
+    #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+      #undef EEPROM_WRITE
+    #endif
   }
 
   EEPROM_Error MarlinSettings::check_version() {
