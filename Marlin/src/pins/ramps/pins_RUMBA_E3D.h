@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2023 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2025 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -19,33 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-/**
- * Platform-independent Arduino functions for I2C EEPROM.
- * Enable USE_SHARED_EEPROM if not supplied by the framework.
- */
-#ifdef ARDUINO_ARCH_HC32
+// ATmega2560
 
-#include "../../../inc/MarlinConfig.h"
+#define BOARD_INFO_NAME      "E3D Rumba"
+#define DEFAULT_MACHINE_NAME "E3D BigBox"
 
-#if ENABLED(IIC_BL24CXX_EEPROM)
+// E3D uses PT100 connected to EXP3
+#define TEMP_0_PIN                            10  // Analog Input
+#define TEMP_1_PIN                             9  // Analog Input
 
-#include "../../../libs/BL24CXX.h"
-#include "../../shared/eeprom_if.h"
-
-void eeprom_init() {
-  BL24CXX::init();
-}
-
-void eeprom_write_byte(uint8_t *pos, unsigned char value) {
-  const unsigned eeprom_address = (unsigned)pos;
-  BL24CXX::writeOneByte(eeprom_address, value);
-}
-
-uint8_t eeprom_read_byte(uint8_t *pos) {
-  const unsigned eeprom_address = (unsigned)pos;
-  return BL24CXX::readOneByte(eeprom_address);
-}
-
-#endif // IIC_BL24CXX_EEPROM
-#endif // ARDUINO_ARCH_HC32
+#include "pins_RUMBA.h"
