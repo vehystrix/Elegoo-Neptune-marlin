@@ -19,7 +19,7 @@ softversion_define = f" -DSOFTVERSION=\\\"{date.today().strftime('%y%m%d')}\\\""
 
 MODELS = ['PRO', 'PLUS', 'MAX']
 
-def build(model: str, temp: int):
+def build(model: str, temp: int, debug_eeprom: bool = False):
     if model not in MODELS: raise ValueError('Unknown model')
 
     temp_define = ''
@@ -30,12 +30,17 @@ def build(model: str, temp: int):
         
         if temp > 290: temp_define += ' -DTEMP_SENSOR_0=61'
     # if
+    debug_define = ''
+    debug_name = ''
+    if debug_eeprom:
+        debug_define += ' -DDEBUG_EEPROM_READWRITE=1 -DDEBUG_EEPROM_READWRITE_EXTRA=1'
+        debug_name = 'DEBUG_'
 
     os.system('platformio run --target clean -e MKS_E3_V2')
     build_flags = os.environ.get('PLATFORMIO_BUILD_FLAGS', '')
-    os.environ['PLATFORMIO_BUILD_FLAGS'] = build_flags + f" -DNEPTUNE_3_{model}=1" + temp_define + softversion_define + f" {args.buildflags}"
+    os.environ['PLATFORMIO_BUILD_FLAGS'] = build_flags + f" -DNEPTUNE_3_{model}=1" + temp_define + debug_define + softversion_define + f" {args.buildflags}"
     os.system('platformio run -e MKS_E3_V2')
-    os.replace(builddir / 'ZNP_ROBIN_NANO.bin', outdir / f"{model}_{tempname}ZNP_ROBIN_NANO.bin")
+    os.replace(builddir / 'ZNP_ROBIN_NANO.bin', outdir / f"{model}_{tempname}{debug_name}ZNP_ROBIN_NANO.bin")
     os.environ['PLATFORMIO_BUILD_FLAGS'] = build_flags
 # def build
 
@@ -44,4 +49,5 @@ for model in MODELS:
     for temp in [260, 300, 320, 350]:
         build(model, temp)
     # for
+    build(model, 260, debug_eeprom=True)
 # for
