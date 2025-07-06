@@ -55,7 +55,12 @@
 #endif
 
 /**
- * M24: Start or Resume SD Print
+ * M24: Start or Resume Media Print
+ *
+ * Parameters:
+ *   With POWER_LOSS_RECOVERY:
+ *     S<pos>   Position in file to resume from
+ *     T<time>  Elapsed time since start of print
  */
 void GcodeSuite::M24() {
 
@@ -99,11 +104,11 @@ void GcodeSuite::M24() {
 }
 
 /**
- * M25: Pause SD Print
+ * M25: Pause Media Print
  *
  * With PARK_HEAD_ON_PAUSE:
- *   Invoke M125 to store the current position and move to the park
- *   position. M24 will move the head back before resuming the print.
+ *   Invoke 'M125' to store the current position and move to the park
+ *   position. 'M24' will move the head back before resuming the print.
  */
 namespace {
   inline void do_M25() {
