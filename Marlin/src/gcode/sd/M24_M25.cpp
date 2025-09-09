@@ -48,6 +48,10 @@
 
 #include "../../MarlinCore.h" // for startOrResumeJob
 
+#if DISABLED(PARK_HEAD_ON_PAUSE) && ENABLED(HEATER_IDLE_HANDLER) && PAUSE_PARK_NOZZLE_TIMEOUT
+  #define MEDIA_PAUSE_PARK_NOZZLE_TIMEOUT 1
+#endif
+
 #if ENABLED(TJC_AVAILABLE)
   #include "../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
   #if HAS_DISPLAY
@@ -64,15 +68,12 @@
  *     T<time>  Elapsed time since start of print
  */
 void GcodeSuite::M24() {
-  #if ENABLED(HEATER_IDLE_HANDLER) && PAUSE_PARK_NOZZLE_TIMEOUT
-    // Re-enable the heaters if they timed out
-    HOTEND_LOOP() {
-      thermalManager.reset_hotend_idle_timer(e);
-    }
-    HOTEND_LOOP() {
-      thermalManager.wait_for_hotend(e);
-    }
+  #if MEDIA_PAUSE_PARK_NOZZLE_TIMEOUT
+    // Re-enable any timed-out heaters
+    HOTEND_LOOP() thermalManager.reset_hotend_idle_timer(e);
+    HOTEND_LOOP() thermalManager.wait_for_hotend(e);
   #endif
+
   #if ALL(ADVANCED_PAUSE_FANS_PAUSE, HAS_FAN)
     thermalManager.set_fans_paused(false);
   #endif
@@ -148,7 +149,8 @@ namespace {
     #if ALL(ADVANCED_PAUSE_FANS_PAUSE, HAS_FAN)
       thermalManager.set_fans_paused(true);
     #endif
-    #if ENABLED(HEATER_IDLE_HANDLER) && PAUSE_PARK_NOZZLE_TIMEOUT
+
+    #if MEDIA_PAUSE_PARK_NOZZLE_TIMEOUT
       // Start the heater idle timers
       const millis_t nozzle_timeout = SEC_TO_MS(PAUSE_PARK_NOZZLE_TIMEOUT);
       HOTEND_LOOP() thermalManager.heater_idle[e].start(nozzle_timeout);
