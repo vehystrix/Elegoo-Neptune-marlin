@@ -77,8 +77,8 @@
     #define NO_AUTO_ASSIGN_WARNING  // suppress warning for auto-assigning LCD serial port
     
     #if NONE(NEPTUNE_3_PRO, NEPTUNE_3_PLUS, NEPTUNE_3_MAX)
-      //#define NEPTUNE_3_PRO      1
-      #define NEPTUNE_3_PLUS   1
+      #define NEPTUNE_3_PRO      1
+      //#define NEPTUNE_3_PLUS   1
       //#define NEPTUNE_3_MAX    1
     #endif
   #endif
