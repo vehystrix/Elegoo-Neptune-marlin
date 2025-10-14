@@ -63,7 +63,7 @@
   #include "../../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
 #endif
 
-#if DISABLED(PROBE_MANUALLY) && FT_MOTION_DISABLE_FOR_PROBING
+#if DISABLED(PROBE_MANUALLY) && ENABLED(FT_MOTION)
   #include "../../../module/ft_motion.h"
 #endif
 
@@ -264,14 +264,13 @@ G29_TYPE GcodeSuite::G29() {
     }
   #else
     constexpr bool do_init = false;
-    constexpr float init_val = 0.0f;
   #endif
 
   // A = Abort manual probing
   // C<bool> = Generate fake probe points (DEBUG_LEVELING_FEATURE)
   const bool seenA = TERN0(PROBE_MANUALLY, parser.seen_test('A')),
          no_action = seenA || seenQ,
-              faux = (ENABLED(DEBUG_LEVELING_FEATURE) && DISABLED(PROBE_MANUALLY) ? parser.boolval('C') : no_action) || do_init;
+         faux = (ENABLED(DEBUG_LEVELING_FEATURE) && DISABLED(PROBE_MANUALLY) ? parser.boolval('C') : no_action) || do_init;
 
   // O = Don't level if leveling is already active
   if (!no_action && planner.leveling_active && parser.boolval('O')) {
