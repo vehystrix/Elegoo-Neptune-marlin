@@ -1107,17 +1107,35 @@
  *
  * Add the G35 command to measure bed corners and help adjust screws. Requires a bed probe.
  */
-//#define ASSISTED_TRAMMING
+#define ASSISTED_TRAMMING
 #if ENABLED(ASSISTED_TRAMMING)
 
   // Define from 3 to 9 points to probe.
+#ifdef NEPTUNE_3_PRO
+  #define TRAMMING_POINT_XY { { 32.5, 32.5 }, { 202.5,  32.5 }, { 202.5, 202.5 }, { 32.5, 202.5 } }
+#elif NEPTUNE_3_PLUS
+  #define TRAMMING_POINT_XY { { X_CENTER, Y_CENTER }, {  37.5, 32.5 }, { 292.5, 32.5 }, { 292.5, 165 }, { 37.5, 165 }, { 37.5, 297.5 }, { 292.5, 297.5 } }
+#elif NEPTUNE_3_MAX
+  #define TRAMMING_POINT_XY { { X_CENTER, Y_CENTER }, {  37.5, 37.5 }, { 392.5, 37.5 }, { 392.5, 215 }, { 37.5, 215 }, { 37.5, 392.5 }, { 392.5, 392.5 } }
+#else
   #define TRAMMING_POINT_XY { {  20, 20 }, { 180,  20 }, { 180, 180 }, { 20, 180 } }
+#endif
 
   // Define position names for probe points.
+#if defined(NEPTUNE_3_PLUS) || defined(NEPTUNE_3_MAX)
+  #define TRAMMING_POINT_NAME_1 "Center"
+  #define TRAMMING_POINT_NAME_2 "Front-Left"
+  #define TRAMMING_POINT_NAME_3 "Front-Right"
+  #define TRAMMING_POINT_NAME_4 "Middle-Right"
+  #define TRAMMING_POINT_NAME_5 "Middle-Left"
+  #define TRAMMING_POINT_NAME_6 "Back-Left"
+  #define TRAMMING_POINT_NAME_7 "Back-Right"
+#else
   #define TRAMMING_POINT_NAME_1 "Front-Left"
   #define TRAMMING_POINT_NAME_2 "Front-Right"
   #define TRAMMING_POINT_NAME_3 "Back-Right"
   #define TRAMMING_POINT_NAME_4 "Back-Left"
+#endif
 
   #define RESTORE_LEVELING_AFTER_G35    // Enable to restore leveling setup after operation
   //#define REPORT_TRAMMING_MM          // Report Z deviation (mm) for each point relative to the first
@@ -1135,7 +1153,7 @@
    *
    * :{'M3_CW':'M3 Clockwise','M3_CCW':'M3 Counter-Clockwise','M4_CW':'M4 Clockwise','M4_CCW':'M4 Counter-Clockwise','M5_CW':'M5 Clockwise','M5_CCW':'M5 Counter-Clockwise'}
    */
-  #define TRAMMING_SCREW_THREAD M3_CW
+  #define TRAMMING_SCREW_THREAD M4_CW
 
 #endif
 
