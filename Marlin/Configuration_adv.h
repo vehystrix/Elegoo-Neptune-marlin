@@ -1172,9 +1172,6 @@
 
   #define FTM_DEFAULT_DYNFREQ_MODE dynFreqMode_DISABLED // Default mode of dynamic frequency calculation. (DISABLED, Z_BASED, MASS_BASED)
 
-  #define FTM_LINEAR_ADV_DEFAULT_ENA   false    // Default linear advance enable (true) or disable (false)
-  #define FTM_LINEAR_ADV_DEFAULT_K      0.0f    // Default linear advance gain. (Acceleration-based scaling factor.)
-
   #define FTM_DEFAULT_SHAPER_X      ftMotionShaper_ZV // Default shaper mode on X axis (NONE, ZV, ZVD, ZVDD, ZVDDD, EI, 2HEI, 3HEI, MZV)
   #if NEPTUNE_3_PRO    // Values averaged from https://www.reddit.com/r/ElegooNeptune3/comments/1d87n5m/new_firmware_marlin_2123_for_neptune_3_proplusmax/
     #define FTM_SHAPING_DEFAULT_FREQ_X   48.485f    // (Hz) Default peak frequency used by input shapers
