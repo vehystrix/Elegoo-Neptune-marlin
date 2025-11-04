@@ -276,8 +276,7 @@ typedef struct SettingsDataStruct {
   // AUTOTEMP
   //
   #if ENABLED(AUTOTEMP)
-    celsius_t planner_autotemp_max, planner_autotemp_min;
-    float planner_autotemp_factor;
+    autotemp_cfg_t planner_autotemp_cfg;                // M104 S B F
   #endif
 
   //
@@ -503,7 +502,7 @@ typedef struct SettingsDataStruct {
   //
   // LIN_ADVANCE
   //
-  #if ENABLED(LIN_ADVANCE)
+  #if HAS_LIN_ADVANCE_K
     float planner_extruder_advance_K[DISTINCT_E];       // M900 K  planner.extruder_advance_K
     #if ENABLED(SMOOTH_LIN_ADVANCE)
       float stepper_extruder_advance_tau[DISTINCT_E];   // M900 U  stepper.extruder_advance_tau
@@ -1045,10 +1044,8 @@ void MarlinSettings::postprocess() {
     // AUTOTEMP
     //
     #if ENABLED(AUTOTEMP)
-      _FIELD_TEST(planner_autotemp_max);
-      EEPROM_WRITE(planner.autotemp.max);
-      EEPROM_WRITE(planner.autotemp.min);
-      EEPROM_WRITE(planner.autotemp.factor);
+      _FIELD_TEST(planner_autotemp_cfg);
+      EEPROM_WRITE(thermalManager.autotemp.cfg);
     #endif
 
     //
@@ -1597,7 +1594,7 @@ void MarlinSettings::postprocess() {
     // Linear Advance
     //
     {
-      #if ENABLED(LIN_ADVANCE)
+      #if HAS_LIN_ADVANCE_K
         _FIELD_TEST(planner_extruder_advance_K);
         EEPROM_WRITE(planner.extruder_advance_K);
         #if ENABLED(SMOOTH_LIN_ADVANCE)
@@ -2122,9 +2119,8 @@ void MarlinSettings::postprocess() {
       // AUTOTEMP
       //
       #if ENABLED(AUTOTEMP)
-        EEPROM_READ(planner.autotemp.max);
-        EEPROM_READ(planner.autotemp.min);
-        EEPROM_READ(planner.autotemp.factor);
+        _FIELD_TEST(planner_autotemp_cfg);
+        EEPROM_READ(thermalManager.autotemp.cfg);
       #endif
 
       //
@@ -2574,7 +2570,7 @@ void MarlinSettings::postprocess() {
 
         #if HAS_TRINAMIC_CONFIG
 
-          #define SET_CURR(Q) stepper##Q.rms_current(currents.Q ? currents.Q : Q##_CURRENT)
+          #define SET_CURR(Q) stepper##Q.rms_current(currents.Q ?: Q##_CURRENT)
           if (!validating) {
             TERN_(X_IS_TRINAMIC,  SET_CURR(X));
             TERN_(Y_IS_TRINAMIC,  SET_CURR(Y));
@@ -2705,7 +2701,7 @@ void MarlinSettings::postprocess() {
       //
       // Linear Advance
       //
-      #if ENABLED(LIN_ADVANCE)
+      #if HAS_LIN_ADVANCE_K
       {
         float extruder_advance_K[DISTINCT_E];
         _FIELD_TEST(planner_extruder_advance_K);
@@ -2721,7 +2717,7 @@ void MarlinSettings::postprocess() {
             DISTINCT_E_LOOP() stepper.set_advance_tau(tau[e], e);
         #endif
       }
-      #endif
+      #endif // HAS_LIN_ADVANCE_K
 
       //
       // Motor Current PWM
@@ -3523,11 +3519,7 @@ void MarlinSettings::reset() {
   //
   // AUTOTEMP
   //
-  #if ENABLED(AUTOTEMP)
-    planner.autotemp.max = AUTOTEMP_MAX;
-    planner.autotemp.min = AUTOTEMP_MIN;
-    planner.autotemp.factor = AUTOTEMP_FACTOR;
-  #endif
+  TERN_(AUTOTEMP, thermalManager.autotemp.reset());
 
   //
   // X Axis Twist Compensation
@@ -3949,6 +3941,11 @@ void MarlinSettings::reset() {
     gcode.say_units(); // " (in/mm)"
 
     //
+    // M104 settings for AUTOTEMP
+    //
+    TERN_(AUTOTEMP, gcode.M104_report());
+
+    //
     // M149 Temperature units
     //
     #if ENABLED(TEMPERATURE_UNITS_SUPPORT)
@@ -4193,7 +4190,7 @@ void MarlinSettings::reset() {
     //
     // Linear Advance
     //
-    TERN_(LIN_ADVANCE, gcode.M900_report(forReplay));
+    TERN_(HAS_LIN_ADVANCE_K, gcode.M900_report(forReplay));
 
     //
     // Motor Current (SPI or PWM)
