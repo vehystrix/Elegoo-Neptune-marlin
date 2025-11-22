@@ -201,7 +201,12 @@
   static int16_t max_top           = 0;
   static int16_t old_top_file      = 0; //< file on top of file chooser
   static int16_t file_to_print     = 0; //< touched file to be confirmed
-  bool Multifile_flag  = true;
+  
+  #ifdef NEPTUNE_3_PRO
+    bool Multifile_flag = false;
+  #else
+    bool Multifile_flag  = true;
+  #endif
 
   void RTS_reset_settings(void) 
   {
