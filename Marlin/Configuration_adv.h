@@ -1211,6 +1211,8 @@
   #define FTM_SHAPING_ZETA_E            0.03f   // Zeta used by input shapers for E axis
   #define FTM_SHAPING_V_TOL_E           0.05f   // Vibration tolerance used by EI input shapers for E axis
 
+  //#define FTM_RESONANCE_TEST                  // Sine sweep motion for resonance study
+
   #define FTM_SMOOTHING                       // Smoothing can reduce artifacts and make steppers quieter
                                                 // on sharp corners, but too much will round corners.
   #if ENABLED(FTM_SMOOTHING)
@@ -1682,7 +1684,7 @@
     #if HAS_MARLINUI_U8GLIB
       //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~3260 (or ~940) bytes of flash.
     #endif
-    #if ANY(HAS_MARLINUI_U8GLIB, TOUCH_UI_FTDI_EVE, HAS_MARLINUI_HD44780)
+    #if ANY(HAS_MARLINUI_U8GLIB, TOUCH_UI_FTDI_EVE, HAS_MARLINUI_HD44780, HAS_GRAPHICAL_TFT)
       //#define SHOW_CUSTOM_BOOTSCREEN    // Show the bitmap in Marlin/_Bootscreen.h on startup.
     #endif
   #endif
@@ -4153,13 +4155,17 @@
 /**
  * G-code Macros
  *
- * Add G-codes M810-M819 to define and run G-code macros.
- * Macros are not saved to EEPROM.
+ * Add G-codes M810-M819 to define and run G-code macros
+ * and M820 to report the current set of macros.
+ * Macros are not saved to EEPROM unless enabled below.
  */
 //#define GCODE_MACROS
 #if ENABLED(GCODE_MACROS)
   #define GCODE_MACROS_SLOTS       5  // Up to 10 may be used
   #define GCODE_MACROS_SLOT_SIZE  50  // Maximum length of a single macro
+  #if ENABLED(EEPROM_SETTINGS)
+    //#define GCODE_MACROS_IN_EEPROM  // Include macros in EEPROM
+  #endif
 #endif
 
 /**
@@ -4181,22 +4187,27 @@
   #define MAIN_MENU_ITEM_1_DESC "Home & UBL Info"
   #define MAIN_MENU_ITEM_1_GCODE "G28\nG29 W"
   //#define MAIN_MENU_ITEM_1_CONFIRM          // Show a confirmation dialog before this action
+  //#define MAIN_MENU_ITEM_1_IMMEDIATE        // Skip the queue and execute immediately. Rarely needed.
 
   #define MAIN_MENU_ITEM_2_DESC "Preheat for " PREHEAT_1_LABEL
   #define MAIN_MENU_ITEM_2_GCODE "M140 S" STRINGIFY(PREHEAT_1_TEMP_BED) "\nM104 S" STRINGIFY(PREHEAT_1_TEMP_HOTEND)
   //#define MAIN_MENU_ITEM_2_CONFIRM
+  //#define MAIN_MENU_ITEM_2_IMMEDIATE
 
   //#define MAIN_MENU_ITEM_3_DESC "Preheat for " PREHEAT_2_LABEL
   //#define MAIN_MENU_ITEM_3_GCODE "M140 S" STRINGIFY(PREHEAT_2_TEMP_BED) "\nM104 S" STRINGIFY(PREHEAT_2_TEMP_HOTEND)
   //#define MAIN_MENU_ITEM_3_CONFIRM
+  //#define MAIN_MENU_ITEM_3_IMMEDIATE
 
   //#define MAIN_MENU_ITEM_4_DESC "Heat Bed/Home/Level"
   //#define MAIN_MENU_ITEM_4_GCODE "M140 S" STRINGIFY(PREHEAT_2_TEMP_BED) "\nG28\nG29"
   //#define MAIN_MENU_ITEM_4_CONFIRM
+  //#define MAIN_MENU_ITEM_4_IMMEDIATE
 
   //#define MAIN_MENU_ITEM_5_DESC "Home & Info"
   //#define MAIN_MENU_ITEM_5_GCODE "G28\nM503"
   //#define MAIN_MENU_ITEM_5_CONFIRM
+  //#define MAIN_MENU_ITEM_5_IMMEDIATE
 #endif
 
 // @section custom config menu
@@ -4213,22 +4224,27 @@
   #define CONFIG_MENU_ITEM_1_DESC "Wifi ON"
   #define CONFIG_MENU_ITEM_1_GCODE "M118 [ESP110] WIFI-STA pwd=12345678"
   //#define CONFIG_MENU_ITEM_1_CONFIRM        // Show a confirmation dialog before this action
+  //#define CONFIG_MENU_ITEM_1_IMMEDIATE      // Skip the queue and execute immediately. Rarely needed.
 
   #define CONFIG_MENU_ITEM_2_DESC "Bluetooth ON"
   #define CONFIG_MENU_ITEM_2_GCODE "M118 [ESP110] BT pwd=12345678"
   //#define CONFIG_MENU_ITEM_2_CONFIRM
+  //#define CONFIG_MENU_ITEM_2_IMMEDIATE
 
   //#define CONFIG_MENU_ITEM_3_DESC "Radio OFF"
   //#define CONFIG_MENU_ITEM_3_GCODE "M118 [ESP110] OFF pwd=12345678"
   //#define CONFIG_MENU_ITEM_3_CONFIRM
+  //#define CONFIG_MENU_ITEM_3_IMMEDIATE
 
   //#define CONFIG_MENU_ITEM_4_DESC "Wifi ????"
   //#define CONFIG_MENU_ITEM_4_GCODE "M118 ????"
   //#define CONFIG_MENU_ITEM_4_CONFIRM
+  //#define CONFIG_MENU_ITEM_4_IMMEDIATE
 
   //#define CONFIG_MENU_ITEM_5_DESC "Wifi ????"
   //#define CONFIG_MENU_ITEM_5_GCODE "M118 ????"
   //#define CONFIG_MENU_ITEM_5_CONFIRM
+  //#define CONFIG_MENU_ITEM_5_IMMEDIATE
 #endif
 
 // @section custom buttons
@@ -4245,6 +4261,7 @@
     #define BUTTON1_WHEN_PRINTING false     // Button allowed to trigger during printing?
     #define BUTTON1_GCODE         "G28"
     #define BUTTON1_DESC          "Homing"  // Optional string to set the LCD status
+    //#define BUTTON1_IMMEDIATE             // Skip the queue and run the G-code immediately. Rarely needed.
   #endif
 
   //#define BUTTON2_PIN -1
@@ -4253,6 +4270,7 @@
     #define BUTTON2_WHEN_PRINTING false
     #define BUTTON2_GCODE         "M140 S" STRINGIFY(PREHEAT_1_TEMP_BED) "\nM104 S" STRINGIFY(PREHEAT_1_TEMP_HOTEND)
     #define BUTTON2_DESC          "Preheat for " PREHEAT_1_LABEL
+    //#define BUTTON2_IMMEDIATE
   #endif
 
   //#define BUTTON3_PIN -1
@@ -4261,6 +4279,7 @@
     #define BUTTON3_WHEN_PRINTING false
     #define BUTTON3_GCODE         "M140 S" STRINGIFY(PREHEAT_2_TEMP_BED) "\nM104 S" STRINGIFY(PREHEAT_2_TEMP_HOTEND)
     #define BUTTON3_DESC          "Preheat for " PREHEAT_2_LABEL
+    //#define BUTTON3_IMMEDIATE
   #endif
 #endif
 

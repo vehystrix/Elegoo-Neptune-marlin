@@ -305,8 +305,9 @@ G29_TYPE GcodeSuite::G29() {
   // Set and report "probing" state to host
   TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_PROBE, false));
 
-  #if DISABLED(PROBE_MANUALLY) && FT_MOTION_DISABLE_FOR_PROBING
-    FTMotionDisableInScope FT_Disabler; // Disable Fixed-Time Motion for probing
+  #if DISABLED(PROBE_MANUALLY)
+    // Potentially disable Fixed-Time Motion for probing
+    TERN_(FT_MOTION, FTM_DISABLE_IN_SCOPE());
   #endif
 
   /**
