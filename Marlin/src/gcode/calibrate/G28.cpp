@@ -61,7 +61,7 @@
 #if ENABLED(EXTENSIBLE_UI)
   #include "../../lcd/extui/ui_api.h"
 #elif ENABLED(DWIN_CREALITY_LCD)
-  #include "../../lcd/e3v2/creality/dwin.h"
+  #include "../../lcd/dwin/creality/dwin.h"
 #elif ENABLED(SOVOL_SV06_RTS)
   #include "../../lcd/sovol_rts/sovol_rts.h"
 #endif
@@ -133,14 +133,13 @@
 #if ENABLED(Z_SAFE_HOMING)
 
   inline void home_z_safely() {
-
-    // Potentially disable Fixed-Time Motion for homing
-    TERN_(FT_MOTION, FTM_DISABLE_IN_SCOPE());
-
     DEBUG_SECTION(log_G28, "home_z_safely", DEBUGGING(LEVELING));
 
     // Disallow Z homing if X or Y homing is needed
     if (homing_needed_error(_BV(X_AXIS) | _BV(Y_AXIS))) return;
+
+    // Potentially disable Fixed-Time Motion for homing
+    TERN_(FT_MOTION, FTM_DISABLE_IN_SCOPE());
 
     sync_plan_position();
 
@@ -386,7 +385,7 @@ void GcodeSuite::G28() {
         float z_homing_height = seenR ? parser.value_linear_units() : Z_CLEARANCE_FOR_HOMING;
 
         // Check for any lateral motion that might require clearance
-        const bool may_skate = seenR NUM_AXIS_GANG(|| doX, || doY, || TERN0(Z_SAFE_HOMING, doZ), || doI, || doJ, || doK, || doU, || doV, || doW);
+        const bool may_skate = seenR && NUM_AXIS_ANY(doX, doY, TERN0(Z_SAFE_HOMING, doZ), doI, doJ, doK, doU, doV, doW);
 
         if (seenR && z_homing_height == 0) {
           if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("R0 = No Z raise");

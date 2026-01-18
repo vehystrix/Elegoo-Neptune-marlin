@@ -46,8 +46,6 @@
   #include "../../lcd/extui/dgus/DGUSDisplayDef.h"
 #endif
 
-#include "../../MarlinCore.h" // for startOrResumeJob
-
 #if DISABLED(PARK_HEAD_ON_PAUSE) && ENABLED(HEATER_IDLE_HANDLER) && PAUSE_PARK_NOZZLE_TIMEOUT
   #define MEDIA_PAUSE_PARK_NOZZLE_TIMEOUT 1
 #endif
@@ -97,7 +95,7 @@ void GcodeSuite::M24() {
 
   if (card.isFileOpen()) {
     card.startOrResumeFilePrinting(); // SD card will now be read for commands
-    startOrResumeJob();               // Start (or resume) the print job timer
+    marlin.startOrResumeJob();        // Start (or resume) the print job timer
     TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
   }
 

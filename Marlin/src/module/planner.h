@@ -254,7 +254,7 @@ typedef struct PlannerBlock {
   #if ENABLED(S_CURVE_ACCELERATION)
     uint32_t acceleration_time_inverse,     // Inverse of acceleration and deceleration periods, expressed as integer. Scale depends on CPU being used
              deceleration_time_inverse;
-  #else
+  #elif HAS_STANDARD_MOTION
     uint32_t acceleration_rate;             // Acceleration rate in (2^24 steps)/timer_ticks*s
   #endif
 
@@ -277,10 +277,17 @@ typedef struct PlannerBlock {
     #endif
   #endif
 
-  uint32_t nominal_rate,                    // The nominal step rate for this block in step_events/sec
-           initial_rate,                    // The jerk-adjusted step rate at start of block
-           final_rate,                      // The minimal rate at exit
-           acceleration_steps_per_s2;       // acceleration steps/sec^2
+  #if ENABLED(FT_MOTION)
+    float entry_speed,                      // Block entry speed in steps units
+          exit_speed;                       // Block exit speed in steps units
+  #endif
+
+  #if HAS_STANDARD_MOTION
+    uint32_t nominal_rate,                  // The nominal step rate for this block in step_events/sec
+             initial_rate,                  // The jerk-adjusted step rate at start of block
+             final_rate,                    // The minimal rate at exit
+             acceleration_steps_per_s2;     // acceleration steps/sec^2
+  #endif
 
   #if ENABLED(DIRECT_STEPPING)
     page_idx_t page_idx;                    // Page index used for direct stepping
@@ -877,7 +884,7 @@ class Planner {
     FORCE_INLINE static block_t* get_next_free_block(uint8_t &next_buffer_head, const uint8_t count=1) {
 
       // Wait until there are enough slots free
-      while (moves_free() < count) { idle(); }
+      while (moves_free() < count) { marlin.idle(); }
 
       // Return the first available block
       next_buffer_head = next_block_index(block_buffer_head);
@@ -1159,12 +1166,14 @@ class Planner {
         vector *= RSQRT(magnitude_sq);
       }
 
+      // max_value is block->acceleration
       FORCE_INLINE static float limit_value_by_axis_maximum(const float max_value, xyze_float_t &unit_vec) {
         float limit_value = max_value;
         LOOP_LOGICAL_AXES(idx) {
           if (unit_vec[idx]) {
-            if (limit_value * ABS(unit_vec[idx]) > settings.max_acceleration_mm_per_s2[idx])
-              limit_value = ABS(settings.max_acceleration_mm_per_s2[idx] / unit_vec[idx]);
+            const uint32_t abs_vec = ABS(unit_vec[idx]);
+            if (limit_value * abs_vec > settings.max_acceleration_mm_per_s2[idx])
+              limit_value = settings.max_acceleration_mm_per_s2[idx] / abs_vec;
           }
         }
         return limit_value;
@@ -1181,10 +1190,18 @@ class Planner {
   #define PLANNER_XY_FEEDRATE_MM_S 60.0f
 #endif
 
-#define ANY_AXIS_MOVES(BLOCK)  \
-  (false NUM_AXIS_GANG(        \
-  || BLOCK->steps.a, || BLOCK->steps.b, || BLOCK->steps.c, \
-  || BLOCK->steps.i, || BLOCK->steps.j, || BLOCK->steps.k, \
-  || BLOCK->steps.u, || BLOCK->steps.v, || BLOCK->steps.w))
+#define XYZ_HAS_STEPS(B) NUM_AXIS_ANY( \
+  B->steps.a, B->steps.b, B->steps.c,  \
+  B->steps.i, B->steps.j, B->steps.k,  \
+  B->steps.u, B->steps.v, B->steps.w)
+
+#if MIN_STEPS_PER_SEGMENT <= 1
+  #define XYZ_HAS_ENOUGH_STEPS XYZ_HAS_STEPS
+#else
+  #define XYZ_HAS_ENOUGH_STEPS(B) NUM_AXIS_ANY( \
+    B->steps.a >= MIN_STEPS_PER_SEGMENT, B->steps.b >= MIN_STEPS_PER_SEGMENT, B->steps.c >= MIN_STEPS_PER_SEGMENT, \
+    B->steps.i >= MIN_STEPS_PER_SEGMENT, B->steps.j >= MIN_STEPS_PER_SEGMENT, B->steps.k >= MIN_STEPS_PER_SEGMENT, \
+    B->steps.u >= MIN_STEPS_PER_SEGMENT, B->steps.v >= MIN_STEPS_PER_SEGMENT, B->steps.w >= MIN_STEPS_PER_SEGMENT)
+#endif
 
 extern Planner planner;
