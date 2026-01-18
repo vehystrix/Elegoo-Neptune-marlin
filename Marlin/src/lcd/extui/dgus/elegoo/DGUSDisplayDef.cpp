@@ -744,7 +744,7 @@
     thermalManager.setTargetBed(0);
     RTS_SndData(0, BED_SET_TEMP_VP);
     thermalManager.zero_fan_speeds();
-    Marlin::wait_for_heatup = Marlin::wait_for_user = false;
+    marlin.wait_for_heatup = marlin.wait_for_user = false;
     PoweroffContinue = false;
     sd_printing_autopause = false;
     if(CardReader::flag.mounted)
@@ -1694,7 +1694,7 @@
             rtscheck.RTS_SndData((elapsed.value % 3600) / 60, PRINT_TIME_MIN_VP);
           #endif
 
-          if(Marlin::printJobOngoing() && (last_cardpercentValue != ui.get_progress_percent()))
+          if(marlin.printJobOngoing() && (last_cardpercentValue != ui.get_progress_percent()))
           {
             if((unsigned char) ui.get_progress_percent() >= 0)
             {
@@ -1753,7 +1753,7 @@
           }
         }
 
-        if(pause_action_flag && (false == sdcard_pause_check) && Marlin::printingIsPaused() && !planner.has_blocks_queued())
+        if(pause_action_flag && (false == sdcard_pause_check) && marlin.printingIsPaused() && !planner.has_blocks_queued())
         {
           pause_action_flag = false;
           /*if((1 == active_extruder) && (1 == save_dual_x_carriage_mode))
@@ -1929,7 +1929,7 @@
         if((thermalManager.temp_hotend[0].celsius >= (thermalManager.temp_hotend[0].target-5)) && (heatway == 1))
         {
           #if ENABLED(RTS_AVAILABLE)
-            if(Marlin::printingIsPaused())
+            if(marlin.printingIsPaused())
             {
               rtscheck.RTS_SndData(ExchangePageBase + 16, ExchangepageAddr); //新UI处理
               #if ENABLED(TJC_AVAILABLE) 
@@ -2789,7 +2789,7 @@
         }
         else if(recdat.data[0] == 2)
         {
-          if(Marlin::printingIsPaused())
+          if(marlin.printingIsPaused())
           {
             RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
             #if ENABLED(TJC_AVAILABLE)
@@ -2797,7 +2797,7 @@
               LCD_SERIAL_2.printf("\xff\xff\xff");
             #endif
           }
-          else if(Marlin::printJobOngoing())
+          else if(marlin.printJobOngoing())
           {
             RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
             #if ENABLED(TJC_AVAILABLE)
@@ -5614,7 +5614,7 @@
           #endif
 
           //printpercent
-          if(Marlin::printJobOngoing() && (last_cardpercentValue != ui.get_progress_percent()))
+          if(marlin.printJobOngoing() && (last_cardpercentValue != ui.get_progress_percent()))
           {
             if((unsigned char) ui.get_progress_percent() >= 0)
             {
@@ -6234,7 +6234,7 @@
 
         if(recdat.data[0] == 1)
         {
-          if(Marlin::printJobOngoing())
+          if(marlin.printJobOngoing())
           {
             RTS_SndData(ExchangePageBase + 23, ExchangepageAddr);
             #if ENABLED(TJC_AVAILABLE) 
@@ -6286,7 +6286,7 @@
         }
         else if(recdat.data[0] == 2)
         {
-          if(Marlin::printJobOngoing())
+          if(marlin.printJobOngoing())
           {
             RTS_SndData(ExchangePageBase + 23, ExchangepageAddr);
             #if ENABLED(TJC_AVAILABLE) 
@@ -6559,7 +6559,7 @@
         }
         else if(recdat.data[0] == 0x10)
         {
-          if(Marlin::printingIsPaused())
+          if(marlin.printingIsPaused())
           {
             //quickstop_stepper();
             planner.quick_stop();
