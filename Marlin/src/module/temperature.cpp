@@ -4739,7 +4739,7 @@ void Temperature::isr() {
         TERN_(PRINTER_EVENT_LEDS, printerEventLEDs.onHeatingDone());
 
         #if ENABLED(RTS_AVAILABLE)
-          if((printJobOngoing() && card.isStillPrinting()) || (printJobOngoing() && PoweroffContinue) )
+          if((Marlin::printJobOngoing() && card.isStillPrinting()) || (Marlin::printJobOngoing() && PoweroffContinue) )
           //if(printJobOngoing())
           {
             rtscheck.RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
