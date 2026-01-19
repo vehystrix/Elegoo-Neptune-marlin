@@ -9,6 +9,10 @@ from argparse import ArgumentParser
 parser = ArgumentParser(description="Build firmware for different models and temperatures.")
 ## eg -DDEBUG_EEPROM_READWRITE=1 -DDEBUG_EEPROM_READWRITE_EXTRA=1
 parser.add_argument('--buildflags', type=str, default='', help='Additional build flags to pass to PlatformIO')
+# Add command-line arguments for model, temperature, and debug status
+parser.add_argument('--model', type=str, choices=['PRO', 'PLUS', 'MAX'], help='Specify the model to build (PRO, PLUS, MAX)')
+parser.add_argument('--temperature', type=int, help='Specify the maximum temperature (default: 260, 300, 320, 350)')
+parser.add_argument('--debug', action='store_true', help='Enable debug EEPROM read/write')
 args = parser.parse_args()
 
 builddir = Path(os.path.dirname(os.path.realpath(__file__))) / '.pio' / 'build' / 'MKS_E3_V2'
@@ -44,10 +48,19 @@ def build(model: str, temp: int, debug_eeprom: bool = False):
     os.environ['PLATFORMIO_BUILD_FLAGS'] = build_flags
 # def build
 
+if args.model:
+    models = [args.model]
+else:
+    models = MODELS
+if args.temperature:
+    temperatures = [args.temperature]
+else:
+    temperatures = [260, 300, 320, 350]
 
-for model in MODELS:
-    for temp in [260, 300, 320, 350]:
-        build(model, temp)
+
+for model in models:
+    for temp in temperatures:
+        build(model, temp, debug_eeprom=args.debug)
     # for
-    build(model, 260, debug_eeprom=True)
-# for
+    if not args.debug:
+        build(model, 260, debug_eeprom=True)
