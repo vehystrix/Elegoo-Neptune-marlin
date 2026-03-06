@@ -5350,6 +5350,9 @@
         {
           Update_Time_Value = RTS_UPDATE_VALUE;
           #if ENABLED(EEPROM_SETTINGS)
+          #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+          SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+          #endif
             settings.save();
           #endif
           queue.enqueue_now_P(PSTR("G1 F1000 Z15.0"));
@@ -5388,6 +5391,9 @@
 
             RTS_SndData(ExchangePageBase + 21, ExchangepageAddr);
             #if ENABLED(EEPROM_SETTINGS)
+            #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+            SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+            #endif
               settings.save();
             #endif
             delay(1000);
@@ -5397,12 +5403,18 @@
         {
           RTS_SndData(ExchangePageBase + 22, ExchangepageAddr);
           #if ENABLED(EEPROM_SETTINGS)
+          #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+          SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+          #endif
             settings.save();
           #endif
         }
         else if(recdat.data[0] == 5)
         {
           #if ENABLED(EEPROM_SETTINGS)
+          #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+          SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+          #endif
             settings.save();
           #endif          
         }
@@ -5410,6 +5422,9 @@
         {
           temp_set_flag = 0x00;
           #if ENABLED(EEPROM_SETTINGS)
+          #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+          SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+          #endif
             settings.save();
           #endif          
         }
@@ -5871,6 +5886,9 @@
         else if(recdat.data[0] == 0x15)
         {
           #if ENABLED(EEPROM_SETTINGS)
+          #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+          SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+          #endif
             settings.save();
           #endif
         }
@@ -7786,6 +7804,9 @@
           else if (recdat.data[0] == 5)
           {
             #if ENABLED(EEPROM_SETTINGS)
+            #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+            SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+            #endif
               settings.save();
             #endif
             //srtscheck.RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
@@ -7822,6 +7843,9 @@
           sprintf_P(commandbuf, PSTR("M218 T1 Z%4.1f"), hotend_offset[1].z);
           queue.enqueue_now_P(commandbuf);
           #if ENABLED(EEPROM_SETTINGS)
+          #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
+          SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+          #endif
             settings.save();
           #endif
           rtscheck.RTS_SndData(ExchangePageBase + 35, ExchangepageAddr);
