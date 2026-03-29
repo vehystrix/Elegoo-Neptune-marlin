@@ -83,10 +83,10 @@
   float ChangeFilament0Temp = 200;
   float ChangeFilament1Temp = 200;
 
-  //float current_position_x0_axis = X_MIN_POS;//0;999---
+  //float motion.position_x0_axis = X_MIN_POS;//0;999---
   #if ENABLED(DUAL_X_CARRIAGE)
-    float current_position_x1_axis = X2_MAX_POS;
-    float current_position_x1_axis = X_MIN_POS;
+    float motion.position_x1_axis = X2_MAX_POS;
+    float motion.position_x1_axis = X_MIN_POS;
   #endif
   
   int heatway = 0;
@@ -173,8 +173,8 @@
 
   #if ENABLED(DUAL_X_CARRIAGE)
     char save_dual_x_carriage_mode;
-    float current_position_x0_axis;
-    float current_position_x1_axis;
+    float motion.position_x0_axis;
+    float motion.position_x1_axis;
   #endif
 
   uint8_t advaned_set = 0;
@@ -230,7 +230,7 @@
   {
     if (!planner.is_full())
     {
-      planner.buffer_line(current_position, MMM_TO_MMS(manual_feedrate_mm_m_[(int8_t)axis]), active_extruder);
+      planner.buffer_line(motion.position, MMM_TO_MMS(manual_feedrate_mm_m_[(int8_t)axis]), motion.extruder);
     }
   }
 
@@ -727,7 +727,7 @@
     ExtUI::stopPrint();
     card.flag.abort_sd_printing = true;
     queue.clear();
-    quickstop_stepper();
+    motion.quickstop_stepper();
     print_job_timer.stop();
     #if DISABLED(SD_ABORT_NO_COOLDOWN)
       thermalManager.disable_all_heaters();
@@ -1040,9 +1040,9 @@
       last_target_temperature[1] = thermalManager.temp_hotend[1].target;
     #endif
 
-    feedrate_percentage = 100;
+    motion.feedrate_percentage = 100;
     #if ENABLED(RTS_AVAILABLE)
-      RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+      RTS_SndData(motion.feedrate_percentage, PRINT_SPEED_RATE_VP);
     #endif
 
     
@@ -1609,7 +1609,7 @@
       #if PIN_EXISTS(LED2)
         if(flag_led1_run_ctrl)
         {
-          if(current_position.z >= 10)
+          if(motion.position.z >= 10)
           {
             OUT_WRITE(LED2_PIN, LOW);
             status_led1 = false;
@@ -1748,7 +1748,7 @@
 
             #if ENABLED(RTS_AVAILABLE) 
               rtscheck.RTS_SndData((unsigned char)ui.get_progress_percent(), PRINT_PROCESS_VP);
-              rtscheck.RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
+              rtscheck.RTS_SndData(10 * motion.position[Z_AXIS], AXIS_Z_COORD_VP);
             #endif 
           }
         }
@@ -1788,19 +1788,19 @@
 
             //X轴坐标
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "main.xvalue.val=%d", (int)(100 * current_position[X_AXIS]));
+            sprintf(temp, "main.xvalue.val=%d", (int)(100 * motion.position[X_AXIS]));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");  
 
             //Y轴坐标
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "main.yvalue.val=%d", (int)(100 * current_position[Y_AXIS]));
+            sprintf(temp, "main.yvalue.val=%d", (int)(100 * motion.position[Y_AXIS]));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");  
 
             //首页-Z轴高度
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "main.zvalue.val=%d", (int)(1000 * current_position[Z_AXIS]));
+            sprintf(temp, "main.zvalue.val=%d", (int)(1000 * motion.position[Z_AXIS]));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");
             
@@ -1808,13 +1808,13 @@
             memset(temp,0,sizeof(temp));
             if((lcd_verion>=142)&&(board_lcd_verion>=142))
             { 
-              sprintf(temp, "printpause.zvalue.val=%d", (int)(100 * current_position[Z_AXIS]));
+              sprintf(temp, "printpause.zvalue.val=%d", (int)(100 * motion.position[Z_AXIS]));
               LCD_SERIAL_2.printf(temp);
               LCD_SERIAL_2.printf("\xff\xff\xff");
             }
             else
             {
-              sprintf(temp, "printpause.zvalue.val=%d", (int)(10 * current_position[Z_AXIS]));
+              sprintf(temp, "printpause.zvalue.val=%d", (int)(10 * motion.position[Z_AXIS]));
               LCD_SERIAL_2.printf(temp);
               LCD_SERIAL_2.printf("\xff\xff\xff");
             }
@@ -1852,8 +1852,8 @@
           //   {
           //     if(!CardReader::flag.mounted)
           //     {
-          //       pause_z = current_position[Z_AXIS];
-          //       pause_e = current_position[E_AXIS];
+          //       pause_z = motion.position[Z_AXIS];
+          //       pause_e = motion.position[E_AXIS];
           //       card.pauseSDPrint();
           //       print_job_timer.pause();
           //       planner.synchronize();
@@ -2116,8 +2116,8 @@
 
           if(Checkfilenum > 10)
           {
-            //pause_z = current_position[Z_AXIS];
-            //pause_e = current_position[E_AXIS];
+            //pause_z = motion.position[Z_AXIS];
+            //pause_e = motion.position[E_AXIS];
 
             #if ENABLED(DUAL_X_CARRIAGE)
               if((0 == save_dual_x_carriage_mode) && (thermalManager.temp_hotend[0].celsius <= (thermalManager.temp_hotend[0].target - 5)))
@@ -2432,7 +2432,7 @@
     }
 
     #if ENABLED(RTS_AVAILABLE)
-      if(active_extruder == 0)
+      if(motion.extruder == 0)
       {
         rtscheck.RTS_SndData(0, EXCHANGE_NOZZLE_ICON_VP);
       }
@@ -2441,9 +2441,9 @@
         rtscheck.RTS_SndData(1, EXCHANGE_NOZZLE_ICON_VP);
       }
 
-      rtscheck.RTS_SndData(10*current_position[X_AXIS], AXIS_X_COORD_VP);
-      rtscheck.RTS_SndData(10*current_position[Y_AXIS], AXIS_Y_COORD_VP);
-      rtscheck.RTS_SndData(10*current_position[Z_AXIS], AXIS_Z_COORD_VP);
+      rtscheck.RTS_SndData(10*motion.position[X_AXIS], AXIS_X_COORD_VP);
+      rtscheck.RTS_SndData(10*motion.position[Y_AXIS], AXIS_Y_COORD_VP);
+      rtscheck.RTS_SndData(10*motion.position[Z_AXIS], AXIS_Z_COORD_VP);
     #endif
 
     #if ENABLED(TJC_AVAILABLE)
@@ -2652,7 +2652,7 @@
         {
           card.flag.abort_sd_printing = true;
           queue.clear();
-          quickstop_stepper();
+          motion.quickstop_stepper();
           print_job_timer.stop();
           print_job_timer.reset();
           sd_printing_autopause = false;
@@ -2863,14 +2863,14 @@
         {
           unit = 10;
           speed_ctrl = 1;
-          RTS_SndData(feedrate_percentage, HEAD1_SET_TEMP_VP);
+          RTS_SndData(motion.feedrate_percentage, HEAD1_SET_TEMP_VP);
           RTS_SndData(0, ICON_ADJUST_PRINTING_SPEED_FLOW); //默认为速度调整界面
           RTS_SndData(2, ICON_ADJUST_PRINTING_S_F_UNIT);   //默认单位调整为10
           RTS_SndData(ExchangePageBase + 17, ExchangepageAddr);
 
           #if ENABLED(TJC_AVAILABLE) 
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+            sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(motion.feedrate_percentage));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");           
 
@@ -2903,9 +2903,9 @@
         else if(recdat.data[0] == 8)
         {
           #if ENABLED(TJC_AVAILABLE) 
-            feedrate_percentage = 100;
+            motion.feedrate_percentage = 100;
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+            sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(motion.feedrate_percentage));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");  
           #endif
@@ -2937,8 +2937,8 @@
 
       case PrintSpeedKey:
       {
-        feedrate_percentage = recdat.data[0];
-        RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+        motion.feedrate_percentage = recdat.data[0];
+        RTS_SndData(motion.feedrate_percentage, PRINT_SPEED_RATE_VP);
       }
       break;
 
@@ -3013,8 +3013,8 @@
           //reject to receive cmd
           waitway = 1;
 
-          //pause_z = current_position[Z_AXIS];
-          //pause_e = current_position[E_AXIS];
+          //pause_z = motion.position[Z_AXIS];
+          //pause_e = motion.position[E_AXIS];
 
           //card.pauseSDPrint();
           //print_job_timer.pause();
@@ -3041,17 +3041,17 @@
 
       case ResumePrintKey:
       {
-            //const float olde = current_position.e;
-            //pause_e = current_position[E_AXIS];
-            //const float olde = current_position[E_AXIS];
+            //const float olde = motion.position.e;
+            //pause_e = motion.position[E_AXIS];
+            //const float olde = motion.position[E_AXIS];
                 /*
             planner.synchronize();
-            const float olde = current_position.e;
-            current_position.e += 50;
-            line_to_current_position(MMM_TO_MMS(250));
-            current_position.e -= 3;
-            line_to_current_position(MMM_TO_MMS(1200));
-            current_position.e = olde;
+            const float olde = motion.position.e;
+            motion.position.e += 50;
+            line_to_motion.position(MMM_TO_MMS(250));
+            motion.position.e -= 3;
+            line_to_motion.position(MMM_TO_MMS(1200));
+            motion.position.e = olde;
             planner.set_e_position_mm(olde);
             planner.synchronize();*/
         if(recdat.data[0] == 1)
@@ -3160,7 +3160,7 @@
                   if(print_preheat_check == true)
                   {
                     queue.clear();
-                    quickstop_stepper();
+                    motion.quickstop_stepper();
                     print_job_timer.stop();
 
                     RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
@@ -3558,8 +3558,8 @@
                 LCD_SERIAL_2.printf("\xff\xff\xff");           
               #endif
             #endif
-            feedrate_percentage = 100;
-            RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+            motion.feedrate_percentage = 100;
+            RTS_SndData(motion.feedrate_percentage, PRINT_SPEED_RATE_VP);
             zprobe_zoffset = last_zoffset;
             RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
             #if ENABLED(TJC_AVAILABLE) 
@@ -3802,12 +3802,12 @@
         else if(recdat.data[0] == 0x0A)
         {
           RTS_SndData(0, ICON_ADJUST_PRINTING_SPEED_FLOW);
-          RTS_SndData(feedrate_percentage, SPEED_SET_VP);
+          RTS_SndData(motion.feedrate_percentage, SPEED_SET_VP);
           speed_ctrl = 1;
 
           #if ENABLED(TJC_AVAILABLE) 
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+            sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(motion.feedrate_percentage));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");           
           #endif 
@@ -3841,19 +3841,19 @@
         {
           if(speed_ctrl==1)
           {
-            if((feedrate_percentage + unit)>300)
+            if((motion.feedrate_percentage + unit)>300)
             {
-              feedrate_percentage = 300;
+              motion.feedrate_percentage = 300;
             }
             else
             {
-              feedrate_percentage = (feedrate_percentage + unit);
+              motion.feedrate_percentage = (motion.feedrate_percentage + unit);
             }
-            RTS_SndData(feedrate_percentage, SPEED_SET_VP);
+            RTS_SndData(motion.feedrate_percentage, SPEED_SET_VP);
 
             #if ENABLED(TJC_AVAILABLE) 
               memset(temp,0,sizeof(temp));
-              sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+              sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(motion.feedrate_percentage));
               LCD_SERIAL_2.printf(temp);
               LCD_SERIAL_2.printf("\xff\xff\xff");           
             #endif 
@@ -3903,18 +3903,18 @@
         {
           if(speed_ctrl==1)
           {
-            if((feedrate_percentage - unit)<10)
+            if((motion.feedrate_percentage - unit)<10)
             {
-              feedrate_percentage = 10;
+              motion.feedrate_percentage = 10;
             }
             else
             {
-              feedrate_percentage = (feedrate_percentage - unit);
+              motion.feedrate_percentage = (motion.feedrate_percentage - unit);
             }
-            RTS_SndData(feedrate_percentage, SPEED_SET_VP);
+            RTS_SndData(motion.feedrate_percentage, SPEED_SET_VP);
             #if ENABLED(TJC_AVAILABLE) 
               memset(temp,0,sizeof(temp));
-              sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+              sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(motion.feedrate_percentage));
               LCD_SERIAL_2.printf(temp);
               LCD_SERIAL_2.printf("\xff\xff\xff");           
             #endif 
@@ -5089,7 +5089,7 @@
           AutoHomeIconNum = 0;
           //active_extruder = 0;
           active_extruder_flag = false;
-          active_extruder_font = active_extruder;
+          active_extruder_font = motion.extruder;
           Update_Time_Value = 0;
           queue.enqueue_now_P(PSTR("G28"));
           queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
@@ -5113,7 +5113,7 @@
 
           #endif
 
-          if (active_extruder == 0)
+          if (motion.extruder == 0)
           {
             RTS_SndData(0, EXCHANGE_NOZZLE_ICON_VP);
           }
@@ -5178,15 +5178,15 @@
           //   #if ENABLED(DUAL_X_CARRIAGE)
           //     if(TEST(axis_known_position, X_AXIS))
           //     {
-          //       current_position_x0_axis = current_position[X_AXIS];
+          //       motion.position_x0_axis = motion.position[X_AXIS];
           //     }
           //     else
           //     {
-          //       current_position[X_AXIS] = current_position_x0_axis;
+          //       motion.position[X_AXIS] = motion.position_x0_axis;
           //     }
-          //     RTS_SndData(10 * current_position_x0_axis, AXIS_X_COORD_VP);
+          //     RTS_SndData(10 * motion.position_x0_axis, AXIS_X_COORD_VP);
           //     memset(commandbuf, 0, sizeof(commandbuf));
-          //     sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x0_axis);
+          //     sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), motion.position_x0_axis);
           //     queue.enqueue_one_now(commandbuf);
           //   #endif
           // }
@@ -5195,20 +5195,20 @@
           //   #if ENABLED(DUAL_X_CARRIAGE)
           //     if(TEST(axis_known_position, X_AXIS))
           //     {
-          //       current_position_x1_axis = current_position[X_AXIS];
+          //       motion.position_x1_axis = motion.position[X_AXIS];
           //     }
           //     else
           //     {
-          //       current_position[X_AXIS] = current_position_x1_axis;
+          //       motion.position[X_AXIS] = motion.position_x1_axis;
           //     }
-          //     RTS_SndData(10 * current_position_x1_axis, AXIS_X_COORD_VP);
+          //     RTS_SndData(10 * motion.position_x1_axis, AXIS_X_COORD_VP);
           //     memset(commandbuf, 0, sizeof(commandbuf));
-          //     sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x1_axis);
+          //     sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), motion.position_x1_axis);
           //     queue.enqueue_one_now(commandbuf);
           //   #endif
           // }
-          // RTS_SndData(10 * current_position[Y_AXIS], AXIS_Y_COORD_VP);
-          // RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
+          // RTS_SndData(10 * motion.position[Y_AXIS], AXIS_Y_COORD_VP);
+          // RTS_SndData(10 * motion.position[Z_AXIS], AXIS_Z_COORD_VP);
         }
         else if (recdat.data[0] == 4)
         {
@@ -5611,7 +5611,7 @@
         {
           //printspeed
           memset(temp,0,sizeof(temp));
-          sprintf(temp, "printpause.printspeed.txt=\"%d\"", feedrate_percentage );
+          sprintf(temp, "printpause.printspeed.txt=\"%d\"", motion.feedrate_percentage );
           LCD_SERIAL_2.printf(temp);
           LCD_SERIAL_2.printf("\xff\xff\xff"); 
 
@@ -6005,57 +6005,57 @@
           {
               if(recdat.data[0] >= 32768)
               {
-                current_position_x1_axis = ((float)recdat.data[0] - 65536) / 10;
+                motion.position_x1_axis = ((float)recdat.data[0] - 65536) / 10;
               }
               else
               {
-                current_position_x1_axis = ((float)recdat.data[0]) / 10;
+                motion.position_x1_axis = ((float)recdat.data[0]) / 10;
               }
 
               delay(2);
 
-              if(current_position_x1_axis > X2_MAX_POS)
+              if(motion.position_x1_axis > X2_MAX_POS)
               {
-                current_position_x1_axis = X2_MAX_POS;
+                motion.position_x1_axis = X2_MAX_POS;
               }
-              else if((TEST(axis_known_position, X_AXIS)) && (current_position_x1_axis < (current_position_x0_axis - X_MIN_POS)))
+              else if((TEST(axis_known_position, X_AXIS)) && (motion.position_x1_axis < (motion.position_x0_axis - X_MIN_POS)))
               {
-                current_position_x1_axis = current_position_x0_axis - X_MIN_POS;
+                motion.position_x1_axis = motion.position_x0_axis - X_MIN_POS;
               }
-              else if(current_position_x1_axis < (X_MIN_POS - X_MIN_POS))
+              else if(motion.position_x1_axis < (X_MIN_POS - X_MIN_POS))
               {
-                current_position_x1_axis = X_MIN_POS - X_MIN_POS;
+                motion.position_x1_axis = X_MIN_POS - X_MIN_POS;
               }
-              current_position[X_AXIS] = current_position_x1_axis;
+              motion.position[X_AXIS] = motion.position_x1_axis;
           }
           else if(active_extruder == 0)
           {
             if(recdat.data[0] >= 32768)
             {
-              current_position_x0_axis = ((float)recdat.data[0] - 65536) / 10;
+              motion.position_x0_axis = ((float)recdat.data[0] - 65536) / 10;
             }
             else
             {
-              current_position_x0_axis = ((float)recdat.data[0]) / 10;
+              motion.position_x0_axis = ((float)recdat.data[0]) / 10;
             }
 
             delay(2);
 
-            if(current_position_x0_axis < X_MIN_POS)
+            if(motion.position_x0_axis < X_MIN_POS)
             {
-              current_position_x0_axis = X_MIN_POS;
+              motion.position_x0_axis = X_MIN_POS;
             }
 
             #if ENABLED(DUAL_X_CARRIAGE)
-              else if((TEST(axis_known_position, X_AXIS)) && (current_position_x0_axis > (current_position_x1_axis + X_MIN_POS)))
+              else if((TEST(axis_known_position, X_AXIS)) && (motion.position_x0_axis > (motion.position_x1_axis + X_MIN_POS)))
               {
-                current_position_x0_axis = current_position_x1_axis + X_MIN_POS;
+                motion.position_x0_axis = motion.position_x1_axis + X_MIN_POS;
               }
-              else if(current_position_x0_axis > (X2_MAX_POS + X_MIN_POS))
+              else if(motion.position_x0_axis > (X2_MAX_POS + X_MIN_POS))
               {
-                current_position_x0_axis = X2_MAX_POS + X_MIN_POS;
+                motion.position_x0_axis = X2_MAX_POS + X_MIN_POS;
               }
-              current_position[X_AXIS] = current_position_x0_axis;
+              motion.position[X_AXIS] = motion.position_x0_axis;
             #endif
           }
         #endif
@@ -6066,23 +6066,23 @@
         x_max = X_MAX_POS;
         if(recdat.data[0] == 1)
         {
-          current_position[X_AXIS] = (current_position[X_AXIS] + 1*axis_unit);
+          motion.position[X_AXIS] = (motion.position[X_AXIS] + 1*axis_unit);
         }
         else
         {
-          current_position[X_AXIS] = (current_position[X_AXIS] - 1*axis_unit);
+          motion.position[X_AXIS] = (motion.position[X_AXIS] - 1*axis_unit);
         }
-        if (current_position[X_AXIS] < x_min)
+        if (motion.position[X_AXIS] < x_min)
         {
-          current_position[X_AXIS] = x_min;
+          motion.position[X_AXIS] = x_min;
         }
-        else if (current_position[X_AXIS] > x_max)
+        else if (motion.position[X_AXIS] > x_max)
         {
-          current_position[X_AXIS] = x_max;
+          motion.position[X_AXIS] = x_max;
         }
 
         RTS_line_to_current(X_AXIS);
-        RTS_SndData(10 * current_position[X_AXIS], AXIS_X_COORD_VP);
+        RTS_SndData(10 * motion.position[X_AXIS], AXIS_X_COORD_VP);
         RTS_SndData(0, MOTOR_FREE_ICON_VP);
         waitway = 0;
       }
@@ -6097,23 +6097,23 @@
 
         if(recdat.data[0] == 1)
         {
-          current_position[Y_AXIS] = (current_position[Y_AXIS] + 1*axis_unit);
+          motion.position[Y_AXIS] = (motion.position[Y_AXIS] + 1*axis_unit);
         }
         else
         {
-          current_position[Y_AXIS] = (current_position[Y_AXIS] - 1*axis_unit);
+          motion.position[Y_AXIS] = (motion.position[Y_AXIS] - 1*axis_unit);
         }
 
-        if (current_position[Y_AXIS] < y_min)
+        if (motion.position[Y_AXIS] < y_min)
         {
-          current_position[Y_AXIS] = y_min;
+          motion.position[Y_AXIS] = y_min;
         }
-        else if (current_position[Y_AXIS] > y_max)
+        else if (motion.position[Y_AXIS] > y_max)
         {
-          current_position[Y_AXIS] = y_max;
+          motion.position[Y_AXIS] = y_max;
         }
         RTS_line_to_current(Y_AXIS);
-        RTS_SndData(10 * current_position[Y_AXIS], AXIS_Y_COORD_VP);
+        RTS_SndData(10 * motion.position[Y_AXIS], AXIS_Y_COORD_VP);
         RTS_SndData(0, MOTOR_FREE_ICON_VP);
         waitway = 0;
       }
@@ -6128,23 +6128,23 @@
 
         if(recdat.data[0] == 1)
         {
-          current_position[Z_AXIS] = (current_position[Z_AXIS] + 1*axis_unit);
+          motion.position[Z_AXIS] = (motion.position[Z_AXIS] + 1*axis_unit);
         }
         else
         {
-          current_position[Z_AXIS] = (current_position[Z_AXIS] - 1*axis_unit);
+          motion.position[Z_AXIS] = (motion.position[Z_AXIS] - 1*axis_unit);
         }
 
-        if (current_position[Z_AXIS] < z_min)
+        if (motion.position[Z_AXIS] < z_min)
         {
-          current_position[Z_AXIS] = z_min;
+          motion.position[Z_AXIS] = z_min;
         }
-        else if (current_position[Z_AXIS] > z_max)
+        else if (motion.position[Z_AXIS] > z_max)
         {
-          current_position[Z_AXIS] = z_max;
+          motion.position[Z_AXIS] = z_max;
         }
         RTS_line_to_current(Z_AXIS);
-        RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
+        RTS_SndData(10 * motion.position[Z_AXIS], AXIS_Z_COORD_VP);
         RTS_SndData(0, MOTOR_FREE_ICON_VP);
         waitway = 0;
       }
@@ -6159,46 +6159,46 @@
             {
               if(active_extruder == 0)
               {
-                current_position_x0_axis = current_position[X_AXIS];
+                motion.position_x0_axis = motion.position[X_AXIS];
                 queue.enqueue_now_P(PSTR("T1"));
                 //active_extruder = 1;
                 active_extruder_flag = true;
                 active_extruder_font = active_extruder;
 
                 memset(commandbuf, 0, sizeof(commandbuf));
-                sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x1_axis);
+                sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), motion.position_x1_axis);
                 queue.enqueue_one_now(commandbuf);
 
                 if(active_extruder == 0)
                 {
-                  RTS_SndData(10 * current_position_x0_axis, AXIS_X_COORD_VP);
+                  RTS_SndData(10 * motion.position_x0_axis, AXIS_X_COORD_VP);
                 }
                 else if(active_extruder == 1)
                 {
-                  RTS_SndData(10 * current_position_x1_axis, AXIS_X_COORD_VP);
+                  RTS_SndData(10 * motion.position_x1_axis, AXIS_X_COORD_VP);
                 }
                 RTS_SndData(1, EXCHANGE_NOZZLE_ICON_VP);
               }
               else if(active_extruder == 1)
               {
                 #if ENABLED(DUAL_X_CARRIAGE)
-                  current_position_x1_axis = current_position[X_AXIS];
+                  motion.position_x1_axis = motion.position[X_AXIS];
                   queue.enqueue_now_P(PSTR("T0"));
                   //active_extruder = 0;
                   active_extruder_flag = false;
                   active_extruder_font = active_extruder;
 
                   memset(commandbuf, 0, sizeof(commandbuf));
-                  sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x0_axis);
+                  sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), motion.position_x0_axis);
                   queue.enqueue_one_now(commandbuf);
 
                   if(active_extruder == 0)
                   {
-                    RTS_SndData(10 * current_position_x0_axis, AXIS_X_COORD_VP);
+                    RTS_SndData(10 * motion.position_x0_axis, AXIS_X_COORD_VP);
                   }
                   else if(active_extruder == 1)
                   {
-                    RTS_SndData(10 * current_position_x1_axis, AXIS_X_COORD_VP);
+                    RTS_SndData(10 * motion.position_x1_axis, AXIS_X_COORD_VP);
                   }
                   RTS_SndData(0, EXCHANGE_NOZZLE_ICON_VP);
                 #endif
@@ -6219,7 +6219,7 @@
                 //active_extruder = 1;
                 active_extruder_font = active_extruder;
                 RTS_SndData(1, EXCHANGE_NOZZLE_ICON_VP);
-                RTS_SndData(10 * current_position[X_AXIS], AXIS_X_COORD_VP);
+                RTS_SndData(10 * motion.position[X_AXIS], AXIS_X_COORD_VP);
               }
               else if(active_extruder == 1)
               {
@@ -6230,7 +6230,7 @@
                 //active_extruder = 1;
                 active_extruder_font = active_extruder;
                 RTS_SndData(0, EXCHANGE_NOZZLE_ICON_VP);
-                RTS_SndData(10 * current_position[X_AXIS], AXIS_X_COORD_VP);
+                RTS_SndData(10 * motion.position[X_AXIS], AXIS_X_COORD_VP);
               }
               RTS_SndData(0, MOTOR_FREE_ICON_VP);
               waitway = 0;
@@ -6245,10 +6245,10 @@
 
         //999------记住挤出或退料前的旧值
         //planner.synchronize();
-        const float olde = current_position.e;
+        const float olde = motion.position.e;
               
-        //current_position.e += PRINT_FILAMENT_LENGTH;
-        //line_to_current_position(MMM_TO_MMS(PRINT_FILAMENT_SPEED));
+        //motion.position.e += PRINT_FILAMENT_LENGTH;
+        //line_to_motion.position(MMM_TO_MMS(PRINT_FILAMENT_SPEED));
 
         if(recdat.data[0] == 1)
         {
@@ -6280,7 +6280,7 @@
               //   #endif
               // }
 
-              current_position.e -= Filament0LOAD;
+              motion.position.e -= Filament0LOAD;
               //active_extruder = 0;
               queue.enqueue_now_P(PSTR("T0"));
 
@@ -6331,7 +6331,7 @@
               //     }
               //   #endif
               // }
-              current_position.e += Filament0LOAD;
+              motion.position.e += Filament0LOAD;
               //active_extruder = 0;
               queue.enqueue_now_P(PSTR("T0"));
 
@@ -6376,7 +6376,7 @@
             // }
 
             #if ENABLED(DUAL_X_CARRIAGE)
-              current_position[E_AXIS] -= Filament1LOAD;
+              motion.position[E_AXIS] -= Filament1LOAD;
               active_extruder = 1;
               queue.enqueue_now_P(PSTR("T1"));
 
@@ -6415,7 +6415,7 @@
             // }
 
             #if ENABLED(DUAL_X_CARRIAGE)
-              current_position[E_AXIS] += Filament1LOAD;
+              motion.position[E_AXIS] += Filament1LOAD;
               active_extruder = 1;
               queue.enqueue_now_P(PSTR("T1"));
 
@@ -6506,8 +6506,8 @@
             //reject to receive cmd
             waitway = 1;
             //222----
-            //pause_z = current_position[Z_AXIS];
-            //pause_e = current_position[E_AXIS];
+            //pause_z = motion.position[Z_AXIS];
+            //pause_e = motion.position[E_AXIS];
 
             card.pauseSDPrint();
             print_job_timer.pause();
@@ -6563,17 +6563,17 @@
         }
         else if(recdat.data[0] == 0x0E)
         {
-          current_position.e -= Filament0LOAD;
+          motion.position.e -= Filament0LOAD;
           RTS_line_to_current(E_AXIS);
           //333----
-          current_position.e = olde;
+          motion.position.e = olde;
         }
         else if(recdat.data[0] == 0x0F)
         {
-          current_position.e += Filament0LOAD;
+          motion.position.e += Filament0LOAD;
           RTS_line_to_current(E_AXIS);
           //333----
-          current_position.e = olde;
+          motion.position.e = olde;
         }
         else if(recdat.data[0] == 0x10)
         {
@@ -6608,11 +6608,11 @@
           break;
         }
         //999----
-        //current_position[E_AXIS] = olde;
-        current_position.e = olde;
+        //motion.position[E_AXIS] = olde;
+        motion.position.e = olde;
         planner.set_e_position_mm(olde);
         //planner.synchronize();
-        //planner.set_e_position_mm(current_position[E_AXIS]);
+        //planner.set_e_position_mm(motion.position[E_AXIS]);
         //planner.synchronize();
       }
       break;
@@ -6725,7 +6725,7 @@
                 LCD_SERIAL_2.printf(temp);
                 LCD_SERIAL_2.printf("\xff\xff\xff");
               #endif
-              RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+              RTS_SndData(motion.feedrate_percentage, PRINT_SPEED_RATE_VP);
             }
           #endif
         }
@@ -7109,8 +7109,8 @@
             #endif
           #endif
 
-          feedrate_percentage = 100;
-          RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+          motion.feedrate_percentage = 100;
+          RTS_SndData(motion.feedrate_percentage, PRINT_SPEED_RATE_VP);
           zprobe_zoffset = last_zoffset;
           RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
 
@@ -7418,8 +7418,8 @@
             #endif
           #endif
 
-          feedrate_percentage = 100;
-          RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+          motion.feedrate_percentage = 100;
+          RTS_SndData(motion.feedrate_percentage, PRINT_SPEED_RATE_VP);
           zprobe_zoffset = last_zoffset;
           RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
 
@@ -7830,17 +7830,17 @@
           rtscheck.RTS_Init();
 
           //RTS_SndData((hotend_offset[1].x - X2_MAX_POS) * 10, TWO_EXTRUDER_HOTEND_XOFFSET_VP);
-          RTS_SndData(hotend_offset[1].y * 10, TWO_EXTRUDER_HOTEND_YOFFSET_VP);
-          RTS_SndData(hotend_offset[1].z * 10, TWO_EXTRUDER_HOTEND_ZOFFSET_VP);
+          RTS_SndData(motion.hotend_offset[1].y * 10, TWO_EXTRUDER_HOTEND_YOFFSET_VP);
+          RTS_SndData(motion.hotend_offset[1].z * 10, TWO_EXTRUDER_HOTEND_ZOFFSET_VP);
         }
         else if (recdat.data[0] == 0xF0)
         {
           memset(commandbuf, 0, sizeof(commandbuf));
-          sprintf_P(commandbuf, PSTR("M218 T1 X%4.1f"), hotend_offset[1].x);
+          sprintf_P(commandbuf, PSTR("M218 T1 X%4.1f"), motion.hotend_offset[1].x);
           queue.enqueue_now_P(commandbuf);
-          sprintf_P(commandbuf, PSTR("M218 T1 Y%4.1f"), hotend_offset[1].y);
+          sprintf_P(commandbuf, PSTR("M218 T1 Y%4.1f"), motion.hotend_offset[1].y);
           queue.enqueue_now_P(commandbuf);
-          sprintf_P(commandbuf, PSTR("M218 T1 Z%4.1f"), hotend_offset[1].z);
+          sprintf_P(commandbuf, PSTR("M218 T1 Z%4.1f"), motion.hotend_offset[1].z);
           queue.enqueue_now_P(commandbuf);
           #if ENABLED(EEPROM_SETTINGS)
           #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
@@ -7998,7 +7998,7 @@
           LCD_SERIAL_2.printf(temp);
           LCD_SERIAL_2.printf("\xff\xff\xff");           
         #endif
-        RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+        RTS_SndData(motion.feedrate_percentage, PRINT_SPEED_RATE_VP);
         #if HAS_HOTEND
           RTS_SndData(thermalManager.temp_hotend[0].target, HEAD0_SET_TEMP_VP);
         #endif
@@ -8141,8 +8141,8 @@
           thermalManager.allow_cold_extrude=false;
           thermalManager.extrude_min_temp = 0;
 
-          destination.set(15,15,15,15);
-          prepare_internal_move_to_destination(500);
+          motion.destination.set(15,15,15,15);
+          motion.prepare_internal_move_to_destination(500);
           LCD_SERIAL_2.printf("motor1.bco=1024");
           LCD_SERIAL_2.printf("\xff\xff\xff");
           LCD_SERIAL_2.printf("motor2.bco=50712");
@@ -8150,8 +8150,8 @@
         }
         else if (recdat.data[0] == 0x0D) //反转
         {
-          destination.set(10,10,10,10);
-          prepare_internal_move_to_destination(500);
+          motion.destination.set(10,10,10,10);
+          motion.prepare_internal_move_to_destination(500);
           LCD_SERIAL_2.printf("motor1.bco=50712");
           LCD_SERIAL_2.printf("\xff\xff\xff");
           LCD_SERIAL_2.printf("motor2.bco=1024");
