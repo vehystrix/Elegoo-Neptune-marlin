@@ -2363,7 +2363,7 @@
     #endif
 
     // Add 'G29 P' to fill the mesh with a single value
-    //#define ABL_BILINEAR_G29_P_FILL_MESH
+    #define ABL_BILINEAR_G29_P_FILL_MESH
 
   #endif
 
