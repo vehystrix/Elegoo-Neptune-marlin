@@ -5409,13 +5409,13 @@
             settings.save();
           #endif
         }
-        else if(recdat.data[0] == 5)
+        else if(recdat.data[0] == 5)  // page printfinish init
         {
           #if ENABLED(EEPROM_SETTINGS)
           #if ENABLED(DEBUG_EEPROM_READWRITE_EXTRA)
-          SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
+          //SERIAL_ECHOLNPGM("Saving settings from lcd " STRINGIFY(__LINE__));
           #endif
-            settings.save();
+            //settings.save();
           #endif          
         }
         else if(recdat.data[0] == 6)
