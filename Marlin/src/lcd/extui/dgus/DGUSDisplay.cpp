@@ -30,6 +30,10 @@
 
 #include "../ui_api.h"
 
+#undef LCD_SERIAL
+#define LCD_SERIAL LCD_SERIAL_2 
+bool LCD_STA=false; // Used to avoid sending data to the display by LCD_SERIAL and LCD_SERIAL_2 through one USART at the same time.
+
 #include "../../../MarlinCore.h"
 #include "../../../module/motion.h"
 #include "../../../gcode/queue.h"
@@ -67,9 +71,9 @@ constexpr uint8_t DGUS_CMD_READVAR = 0x83;
 
 void DGUSDisplay::initDisplay() {
   #ifndef LCD_BAUDRATE
-    #define LCD_BAUDRATE 115200
+    #define LCD_BAUDRATE 250000
   #endif
-  LCD_SERIAL.begin(LCD_BAUDRATE);
+  LCD_SERIAL_2.begin(LCD_BAUDRATE);
 
   if (TERN1(POWER_LOSS_RECOVERY, !recovery.valid())) {  // If no Power-Loss Recovery is needed...
     TERN_(DGUS_LCD_UI_MKS, delay(LOGO_TIME_DELAY));     // Show the logo for a little while
@@ -78,7 +82,6 @@ void DGUSDisplay::initDisplay() {
   requestScreen(TERN(SHOW_BOOTSCREEN, DGUS_SCREEN_BOOT, DGUS_SCREEN_MAIN));
 
   #if ENABLED(RTS_AVAILABLE)
-    LCD_SERIAL_2.begin(LCD_BAUDRATE);
     rtscheck.RTS_Init();
   #endif
 }
@@ -87,7 +90,7 @@ void DGUSDisplay::writeVariable_P(uint16_t adr, const void *values, uint8_t valu
   const char* myvalues = static_cast<const char*>(values);
   bool strend = !myvalues;
   writeHeader(adr, DGUS_CMD_WRITEVAR, valueslen);
-  while (valueslen--) {
+  if (LCD_STA==true){ while (valueslen--) {
     char x;
     if (!strend) x = pgm_read_byte(myvalues++);
     if ((isstr && !x) || strend) {
@@ -95,14 +98,15 @@ void DGUSDisplay::writeVariable_P(uint16_t adr, const void *values, uint8_t valu
       x = ' ';
     }
     LCD_SERIAL.write(x);
-  }
+   }
+ }
 }
 
 void DGUSDisplay::writeVariable(uint16_t adr, const void *values, uint8_t valueslen, bool isstr/*=false*/) {
   const char* myvalues = static_cast<const char*>(values);
   bool strend = !myvalues;
   writeHeader(adr, DGUS_CMD_WRITEVAR, valueslen);
-  while (valueslen--) {
+  if (LCD_STA==true){ while (valueslen--) {
     char x;
     if (!strend) x = *myvalues++;
     if ((isstr && !x) || strend) {
@@ -110,7 +114,8 @@ void DGUSDisplay::writeVariable(uint16_t adr, const void *values, uint8_t values
       x = ' ';
     }
     LCD_SERIAL.write(x);
-  }
+   }
+ }
 }
 
 void DGUSDisplay::writeVariable(uint16_t adr, uint16_t value) {
@@ -164,92 +169,8 @@ void DGUSDisplay::processRx() {
   #endif
 
   uint8_t receivedbyte;
-  while (LCD_SERIAL.available()) {
-    switch (rx_datagram_state) {
 
-      case DGUS_IDLE: // Waiting for the first header byte
-        receivedbyte = LCD_SERIAL.read();
-        //DEBUGLCDCOMM_ECHOPGM("< ", receivedbyte);
-        if (DGUS_HEADER1 == receivedbyte) rx_datagram_state = DGUS_HEADER1_SEEN;
-        break;
-
-      case DGUS_HEADER1_SEEN: // Waiting for the second header byte
-        receivedbyte = LCD_SERIAL.read();
-        //DEBUGLCDCOMM_ECHOPGM(" ", receivedbyte);
-        rx_datagram_state = (DGUS_HEADER2 == receivedbyte) ? DGUS_HEADER2_SEEN : DGUS_IDLE;
-        #if ENABLED(RTS_AVAILABLE)
-          count_state++;
-          if(DGUS_HEADER2 == receivedbyte)  count_state=0;
-        #endif
-        break;
-
-      case DGUS_HEADER2_SEEN: // Waiting for the length byte
-        rx_datagram_len = LCD_SERIAL.read();
-        //DEBUGLCDCOMM_ECHOPGM(" (", rx_datagram_len, ") ");
-
-        // Telegram min len is 3 (command and one word of payload)
-        rx_datagram_state = WITHIN(rx_datagram_len, 3, DGUS_RX_BUFFER_SIZE) ? DGUS_WAIT_TELEGRAM : DGUS_IDLE;
-        #if ENABLED(RTS_AVAILABLE)
-          count_state++;
-          if(rx_datagram_state==DGUS_WAIT_TELEGRAM) count_state = 0;
-        #endif
-        break;
-
-      case DGUS_WAIT_TELEGRAM: // wait for complete datagram to arrive.
-        if (LCD_SERIAL.available() < rx_datagram_len) return;
-
-        initialized = true; // We've talked to it, so we defined it as initialized.
-        const uint8_t command = LCD_SERIAL.read();
-
-        //DEBUGLCDCOMM_ECHOPGM("# ", command);
-
-        uint8_t readlen = rx_datagram_len - 1;  // command is part of len.
-        unsigned char tmp[rx_datagram_len - 1];
-        unsigned char *ptmp = tmp;
-        while (readlen--) {
-          receivedbyte = LCD_SERIAL.read();
-          //DEBUGLCDCOMM_ECHOPGM(" ", receivedbyte);
-          *ptmp++ = receivedbyte;
-        }
-        //DEBUGLCDCOMM_ECHOPGM(" # ");
-        // mostly we'll get this: 5A A5 03 82 4F 4B -- ACK on 0x82, so discard it.
-        if (command == DGUS_CMD_WRITEVAR && 'O' == tmp[0] && 'K' == tmp[1]) {
-          //DEBUGLCDCOMM_ECHOPGM(">");
-          rx_datagram_state = DGUS_IDLE;
-          break;
-        }
-
-        /* AutoUpload, (and answer to) Command 0x83 :
-        |      tmp[0  1  2  3  4 ... ]
-        | Example 5A A5 06 83 20 01 01 78 01 ……
-        |          / /  |  |   \ /   |  \     \
-        |        Header |  |    |    |   \_____\_ DATA (Words!)
-        |     DatagramLen  /  VPAdr  |
-        |           Command          DataLen (in Words) */
-        if (command == DGUS_CMD_READVAR) {
-          const uint16_t vp = tmp[0] << 8 | tmp[1];
-          DGUS_VP_Variable ramcopy;
-          if (populate_VPVar(vp, &ramcopy)) {
-            if (ramcopy.set_by_display_handler)
-              ramcopy.set_by_display_handler(ramcopy, &tmp[3]);
-          }
-
-          #if ENABLED(RTS_AVAILABLE)
-            count_state++;
-            if((command == DGUS_CMD_READVAR)||(command == DGUS_CMD_WRITEVAR && 'O' == tmp[0] && 'K' == tmp[1])) count_state=0;
-          #endif
-
-          rx_datagram_state = DGUS_IDLE;
-          break;
-        }
-
-      // discard anything else
-      rx_datagram_state = DGUS_IDLE;
-    }
-  }
-
-  #if ENABLED(RTS_AVAILABLE)
-  if(LCD_SERIAL_2.available())
+  while (LCD_SERIAL_2.available())
   {
     switch (rx_datagram_state) 
     {
@@ -285,6 +206,8 @@ void DGUSDisplay::processRx() {
           if(rx_datagram_state==DGUS_WAIT_TELEGRAM) count_state = 0;
         #endif
         //SERIAL_ECHOLNPGM("receive rx_datagram_len\r\n");
+
+        LCD_STA=true;
       }
       break;
 
@@ -320,6 +243,8 @@ void DGUSDisplay::processRx() {
           break;
         }
 
+         LCD_STA=false;
+
         /* AutoUpload, (and answer to) Command 0x83 :
         |      tmp[0  1  2  3  4 ... ]
         | Example 5A A5 06 83 20 01 01 78 01 ……
@@ -327,6 +252,7 @@ void DGUSDisplay::processRx() {
         |        Header |  |    |    |   \_____\_ DATA (Words!)
         |     DatagramLen  /  VPAdr  |
         |           Command          DataLen (in Words) */
+
         if (command == DGUS_CMD_READVAR) 
         {
           #if ENABLED(RTS_AVAILABLE)
@@ -375,22 +301,24 @@ void DGUSDisplay::processRx() {
     count_state = 0;
     rx_datagram_state = DGUS_IDLE;
   }
-  #endif
 }
 
 size_t DGUSDisplay::getFreeTxBuffer() { return LCD_SERIAL_TX_BUFFER_FREE(); }
 
 void DGUSDisplay::writeHeader(uint16_t adr, uint8_t cmd, uint8_t payloadlen) {
+  if (LCD_STA==true){
   LCD_SERIAL.write(DGUS_HEADER1);
   LCD_SERIAL.write(DGUS_HEADER2);
   LCD_SERIAL.write(payloadlen + 3);
   LCD_SERIAL.write(cmd);
   LCD_SERIAL.write(adr >> 8);
   LCD_SERIAL.write(adr & 0xFF);
+ }
 }
 
 void DGUSDisplay::writePGM(const char str[], uint8_t len) {
-  while (len--) LCD_SERIAL.write(pgm_read_byte(str++));
+  if (LCD_STA==true){
+  while (len--) LCD_SERIAL.write(pgm_read_byte(str++));}
 }
 
 void DGUSDisplay::loop() {
