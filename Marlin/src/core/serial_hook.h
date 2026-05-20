@@ -306,3 +306,14 @@ struct MultiSerial : public SerialBase< MultiSerial< REPEAT(NUM_SERIAL, _S_NAME)
     #define Serial3Class ConditionalSerial
   #endif
 #endif
+
+#if ENABLED(ENABLE_DUMMY_SERIAL)
+  #include "serial_dummy.h"
+  extern Serial1Class<DummySerial> MSerial1Dummy;
+  #if Serial2Class
+    extern Serial2Class<DummySerial> MSerial2Dummy;
+  #endif
+  #if Serial3Class
+    extern Serial3Class<DummySerial> MSerial3Dummy;
+  #endif
+#endif
