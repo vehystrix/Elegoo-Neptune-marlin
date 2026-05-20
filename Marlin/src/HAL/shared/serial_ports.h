@@ -145,7 +145,6 @@
 //
 
 #if ENABLED(N3P_WIFI)
-  #undef LCD_SERIAL
   #define LCD_SERIAL MSerial1Dummy
 #else
 
