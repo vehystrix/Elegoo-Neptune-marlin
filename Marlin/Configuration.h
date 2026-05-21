@@ -87,6 +87,8 @@
 #define N3P_WIFI
 #if ENABLED(N3P_WIFI)
   #define ENABLE_DUMMY_SERIAL
+  #define SERIAL_PORT_2 2
+  #define BAUDRATE_2 250000 
 #endif
 
 // @section serial
