@@ -102,6 +102,7 @@
 //#define FLASH_EEPROM_EMULATION                  // Use Flash-based EEPROM emulation
 #if ANY(NO_EEPROM_SELECTED, I2C_EEPROM)
   #define I2C_EEPROM
+  #define SOFT_I2C_EEPROM                         // Force the use of Software I2C
   #define MARLIN_EEPROM_SIZE              0x1000  // 4KB
   #define I2C_SCL_PIN                       PB6
   #define I2C_SDA_PIN                       PB7
