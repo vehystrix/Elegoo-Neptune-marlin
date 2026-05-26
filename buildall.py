@@ -13,6 +13,7 @@ parser.add_argument('--buildflags', type=str, default='', help='Additional build
 parser.add_argument('--model', type=str, choices=['PRO', 'PLUS', 'MAX'], help='Specify the model to build (PRO, PLUS, MAX)')
 parser.add_argument('--temperature', type=int, help='Specify the maximum temperature (default: 260, 300, 320, 350)')
 parser.add_argument('--debug', action='store_true', help='Enable debug EEPROM read/write')
+parser.add_argument('--wifi', action='store_true', help='Enable WiFi support')
 args = parser.parse_args()
 
 builddir = Path(os.path.dirname(os.path.realpath(__file__))) / '.pio' / 'build' / 'MKS_E3_V2'
@@ -23,7 +24,7 @@ softversion_define = f" -DSOFTVERSION=\\\"{date.today().strftime('%y%m%d')}\\\""
 
 MODELS = ['PRO', 'PLUS', 'MAX']
 
-def build(model: str, temp: int, debug_eeprom: bool = False):
+def build(model: str, temp: int, debug_eeprom: bool = False, wifi: bool = False):
     if model not in MODELS: raise ValueError('Unknown model')
 
     temp_define = ''
@@ -40,11 +41,17 @@ def build(model: str, temp: int, debug_eeprom: bool = False):
         debug_define += ' -DDEBUG_EEPROM_READWRITE=1 -DDEBUG_EEPROM_READWRITE_EXTRA=1'
         debug_name = 'DEBUG_'
 
+    wifi_define = ''
+    wifi_name = ''
+    if wifi:
+        wifi_define = ' -DN3P_WIFI=1'
+        wifi_name = 'WIFI_'
+
     os.system('platformio run --target clean -e MKS_E3_V2')
     build_flags = os.environ.get('PLATFORMIO_BUILD_FLAGS', '')
-    os.environ['PLATFORMIO_BUILD_FLAGS'] = build_flags + f" -DNEPTUNE_3_{model}=1" + temp_define + debug_define + softversion_define + f" {args.buildflags}"
+    os.environ['PLATFORMIO_BUILD_FLAGS'] = build_flags + f" -DNEPTUNE_3_{model}=1" + temp_define + debug_define + softversion_define + wifi_define + f" {args.buildflags}"
     os.system('platformio run -e MKS_E3_V2')
-    os.replace(builddir / 'ZNP_ROBIN_NANO.bin', outdir / f"{model}_{tempname}{debug_name}ZNP_ROBIN_NANO.bin")
+    os.replace(builddir / 'ZNP_ROBIN_NANO.bin', outdir / f"{model}_{tempname}{wifi_name}{debug_name}ZNP_ROBIN_NANO.bin")
     os.environ['PLATFORMIO_BUILD_FLAGS'] = build_flags
 # def build
 
@@ -60,7 +67,9 @@ else:
 
 for model in models:
     for temp in temperatures:
-        build(model, temp, debug_eeprom=args.debug)
+        build(model, temp, debug_eeprom=args.debug, wifi=args.wifi)
     # for
     if not args.debug:
         build(model, 260, debug_eeprom=True)
+    if not args.wifi:
+        build(model, 260, debug_eeprom=False, wifi=True)
