@@ -2990,7 +2990,7 @@ static_assert(NUM_SERVOS <= NUM_SERVO_PLUGS, "NUM_SERVOS (or some servo index) i
 #ifdef LCD_SERIAL_PORT
   #if LCD_SERIAL_PORT == SERIAL_PORT
     #error "LCD_SERIAL_PORT cannot be the same as SERIAL_PORT."
-  #elif !defined(ENABLE_DUMMY_SERIAL) && defined(SERIAL_PORT_2) && LCD_SERIAL_PORT == SERIAL_PORT_2
+  #elif defined(SERIAL_PORT_2) && LCD_SERIAL_PORT == SERIAL_PORT_2
     #error "LCD_SERIAL_PORT cannot be the same as SERIAL_PORT_2."
   #elif defined(RS485_SERIAL_PORT) && LCD_SERIAL_PORT == RS485_SERIAL_PORT
     #error "LCD_SERIAL_PORT cannot be the same as RS485_SERIAL_PORT."

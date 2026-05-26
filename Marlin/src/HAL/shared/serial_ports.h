@@ -144,7 +144,7 @@
 // LCD_SERIAL_PORT => LCD_SERIAL
 //
 
-#if ENABLED(N3P_WIFI)
+#if ENABLED(TJC_AVAILABLE)
   #define LCD_SERIAL MSerial1Dummy
 #else
 
