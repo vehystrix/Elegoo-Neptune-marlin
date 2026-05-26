@@ -46,6 +46,8 @@
   #include "../../lcd/extui/dgus/DGUSDisplayDef.h"
 #endif
 
+#include "../../MarlinCore.h" // for startOrResumeJob
+
 #if DISABLED(PARK_HEAD_ON_PAUSE) && ENABLED(HEATER_IDLE_HANDLER) && PAUSE_PARK_NOZZLE_TIMEOUT
   #define MEDIA_PAUSE_PARK_NOZZLE_TIMEOUT 1
 #endif
