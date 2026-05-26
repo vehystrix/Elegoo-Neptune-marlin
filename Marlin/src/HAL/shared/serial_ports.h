@@ -144,6 +144,10 @@
 // LCD_SERIAL_PORT => LCD_SERIAL
 //
 
+#if ENABLED(TJC_AVAILABLE)
+  #define LCD_SERIAL MSerial1Dummy
+#else
+
 #ifdef LCD_SERIAL_PORT
   #if WITHIN(LCD_SERIAL_PORT, SERIAL_INDEX_MIN, SERIAL_INDEX_MAX)
     #define LCD_SERIAL MSERIAL(LCD_SERIAL_PORT)
@@ -154,6 +158,8 @@
     static_assert(false, "LCD_SERIAL_PORT" INDEX_RANGE_MSG ".");
     #define LCD_SERIAL _MSERIAL(1) // Dummy port
   #endif
+#endif
+
 #endif
 
 #ifdef LCD_SERIAL_PORT_2
