@@ -53,6 +53,10 @@
   #include "../../../../lcd/extui/dgus/DGUSScreenHandler.h"
   #include "../../../../lcd/extui/dgus/DGUSScreenHandlerBase.h"
   #include "../../../../../src/feature/host_actions.h"
+
+  #if HAS_FILAMENT_SENSOR
+    #include "../../../../../src/feature/runout.h"
+  #endif
   
   #if ENABLED(CASE_LIGHT_ENABLE)
     #include "../../../../../src/feature/caselight.h"
@@ -239,6 +243,9 @@
     recdat.head[0] = snddat.head[0] = FHONE;
     recdat.head[1] = snddat.head[1] = FHTWO;
     memset(databuf, 0, sizeof(databuf));
+    #if HAS_FILAMENT_SENSOR
+      enable_filment_check = runout.enabled;
+    #endif
   }
 
   #if ENABLED(SDSUPPORT)
@@ -2053,6 +2060,10 @@
     static uint32_t update_time;
     
     rtscheck.RTS_SDCardUpate(); // Check the status of card
+
+    #if HAS_FILAMENT_SENSOR
+      enable_filment_check = runout.enabled;
+    #endif
 
     if( (enable_filment_check || RTS_M600_Flag)  && card.isStillPrinting())
     {
@@ -5248,22 +5259,17 @@
         }
         else if(recdat.data[0] == 8)
         {
-          if(enable_filment_check)
-          {
-            enable_filment_check = false;
-            #if ENABLED(TJC_AVAILABLE) 
-              LCD_SERIAL_2.printf("set.va1.val=0");
-              LCD_SERIAL_2.printf("\xff\xff\xff");               
-            #endif            
-          }
-          else
-          {
-            enable_filment_check = true;
-            #if ENABLED(TJC_AVAILABLE) 
-              LCD_SERIAL_2.printf("set.va1.val=1");
-              LCD_SERIAL_2.printf("\xff\xff\xff");               
-            #endif               
-          }
+          #if HAS_FILAMENT_SENSOR
+            runout.enabled = !runout.enabled;
+            enable_filment_check = runout.enabled;
+            if (runout.enabled) runout.reset();
+          #else
+            enable_filment_check = !enable_filment_check;
+          #endif
+          #if ENABLED(TJC_AVAILABLE) 
+            LCD_SERIAL_2.printf("set.va1.val=%d", enable_filment_check ? 1 : 0);
+            LCD_SERIAL_2.printf("\xff\xff\xff");               
+          #endif 
         }
         else if(recdat.data[0] == 9)
         {
