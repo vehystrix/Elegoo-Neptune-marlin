@@ -144,19 +144,6 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 | Level tab (m3) | 22 | Navigate to `warn_rdlevel` page | — | — |
 | Machine model pic (p0) | 11 | Updates based on `main.va0.val` | — | — |
 
-### Key Actions
-
-| Key Enum | Key Data | Action |
-|----------|----------|--------|
-| `MainPageKey` | 1 | SD card update, navigate to `printfiles` (multifile) or `file1` (single), or `nosdcard` if no card |
-| `MainPageKey` | 2 | Abort print: clear queue, quickstop steppers, stop timers, reset progress/time VPs |
-| `MainPageKey` | 3 | Toggle fan icon (head0 and head1) |
-| `MainPageKey` | 4 | Update filament sensor icon based on `enable_filment_check` |
-| `MainPageKey` | 5 | Update dual X carriage mode icons (two-color/copy/mirror/single) |
-| `MainPageKey` | 6 | SD card file list refresh |
-| `MainPageKey` | 8 | Set `Multifile_flag=false` (single file mode) |
-| `MainPageKey` | 9 | Set `Multifile_flag=true` (multi-file mode) |
-
 ---
 
 ## File Browser Screens
@@ -226,20 +213,6 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 2. Show pause screen with picture preview
 3. Set `PoweroffContinue = true`
 
-### Key Actions
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `AdjustmentKey` | 1 | 10/11/12 | Navigate to `adjusttemp` page |
-| `AdjustmentKey` | 2 | 10/11/12 | Show correct pause page (10/11/12) based on print state |
-| `StopPrintKey` | 0xF0 | 10/11/12 | Show appropriate pause page (11 if printing, 12 if SD paused, 10 otherwise) |
-| `PausePrintKey` | 0xF1 | 10/11/12 | Pause print: set `waitway=1`, call `ExtUI::pausePrint()`, show wait page |
-| `PausePrintKey` | 0x01 | 10/11/12 | Show `pauseconfirm` page if still printing |
-| `ResumePrintKey` | 1 | 10/11/12 | Resume print: check filament, enqueue G92.9 E, call `ExtUI::resumePrint()`, show page 11 |
-| `ResumePrintKey` | 2 | 10/11/12 | M600 filament change resume: check filament, preheat if needed, send M23/M24 |
-| `ResumePrintKey` | 3 | 10/11/12 | Power loss recovery resume: update filament icons, call `marlin.user_resume()`, show `filamentresume` |
-| `ResumePrintKey` | 4 | 10/11/12 | SD card resume: mount card, start/resume file printing, show page 11 |
-
 ### Confirmation Dialogs
 
 **Pause Confirmation (Page 25 — `pauseconfirm.txt`)**
@@ -289,33 +262,6 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 | Filament icon (q8) | 8 | Navigate to filament screen | `SettingScreenKey` (0x103E) | 2 |
 | targettemp (number box) | 20 | Set target temperature | `Heater0TempEnterKey` (0x1034) / `HotBedTempEnterKey` (0x103A) | temp value |
 
-### Key Actions
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `TempScreenKey` | 1 | 28/51 | Select nozzle tab: `temp_ctrl=1`, send nozzle target to display |
-| `TempScreenKey` | 3 | 28/51 | Select bed tab: `temp_ctrl=0`, send bed target to display |
-| `TempScreenKey` | 5 | 28/51 | Unit 1°C: `unit=1`, update icon |
-| `TempScreenKey` | 6 | 28/51 | Unit 5°C: `unit=5`, update icon |
-| `TempScreenKey` | 7 | 28/51 | Unit 10°C: `unit=10`, update icon |
-| `TempScreenKey` | 8 | 28/51 | ++ temperature: increment target by `unit` |
-| `TempScreenKey` | 9 | 28/51 | -- temperature: decrement target by `unit` |
-| `TempScreenKey` | 0x0A | 28/51 | Speed tab: `speed_ctrl=1`, navigate to `adjustspeed` |
-| `TempScreenKey` | 0x0B | 28/51 | Flow tab: `speed_ctrl=2`, navigate to `adjustspeed` |
-| `TempScreenKey` | 0x0C | 28/51 | Fan tab: `speed_ctrl=3`, navigate to `adjustspeed` |
-| `TempScreenKey` | 0x0D | 28/51 | ++ speed/flow/fan: increment based on `speed_ctrl` |
-| `TempScreenKey` | 0x0E | 28/51 | -- speed/flow/fan: decrement based on `speed_ctrl` |
-| `TempScreenKey` | 0x0F | 28/51 | Advanced set max speed: `advaned_set=1` |
-| `TempScreenKey` | 0x10 | 28/51 | Advanced set max accel: `advaned_set=2` |
-| `TempScreenKey` | 0x11-0x14 | 28/51 | -- max feedrate/accel for X/Y/Z/E axes |
-| `TempScreenKey` | 0x15-0x18 | 28/51 | ++ max feedrate/accel for X/Y/Z/E axes |
-| `TempScreenKey` | 0xF1 | 28/51 | Cancel all: clear all targets, navigate to page 15 |
-| `TempScreenKey` | 0xF0 | 28/51 | Cancel: navigate to page 15 |
-| `Heater0TempEnterKey` | temp value | 28/51 | Set hotend 0 target temperature (byte-swap on TJC displays) |
-| `HotBedTempEnterKey` | temp value | 28/51 | Set bed target temperature (byte-swap on TJC displays) |
-| `SettingScreenKey` | 0x0A | 28/51 | Navigate to `prefilament` page |
-| `SettingScreenKey` | 2 | 28/51 | Filament preheat |
-
 ---
 
 ## Speed/Flow Adjustment (`adjustspeed.txt` — Page 52)
@@ -338,15 +284,6 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 | Reset Flow button | — | Reset flow to 100% | `AdjustmentKey` (0x1004) | 9 |
 | Fan full button | — | Set fan to 255 | `AdjustmentKey` (0x1004) | 0x0A |
 
-### Key Actions
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `AdjustmentKey` | 6 | 28/51 | Navigate to speed screen: `speed_ctrl=1`, send feedrate % |
-| `AdjustmentKey` | 8 | 52 | Reset speed: `motion.feedrate_percentage=100` |
-| `AdjustmentKey` | 9 | 52 | Reset flow: `planner.flow_percentage[0]=100` |
-| `AdjustmentKey` | 0x0A | 52 | Fan full: `thermalManager.fan_speed[0]=255` |
-
 ---
 
 ## Z-Offset Adjustment (`adjustzoffset.txt` — Page 53)
@@ -366,16 +303,6 @@ Unit modes: 0.1mm (icon 1), 0.01mm (icon 2)
 |--------|----|---------------------|----------|----------|
 | z_offset (number box) | — | Set Z-offset value | `ZOffsetKey` (0x1026) | signed 16-bit / 100 |
 | Unit icons (q5/q6/q7) | — | Toggle unit: 0.1mm / 0.01mm / 1mm | `BedLevelFunKey` (0x1044) | 4 / 5 / 6 |
-
-### Key Actions
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `AdjustmentKey` | 7 | 28/51 | Navigate to Z-offset screen, set unit to 0.1mm |
-| `ZOffsetKey` | signed 16-bit / 100 | 53 | Apply babystepping, update `probe.offset.z` |
-| `BedLevelFunKey` | 4 | 349 | Unit 0.01mm |
-| `BedLevelFunKey` | 5 | 349 | Unit 0.1mm |
-| `BedLevelFunKey` | 6 | 349 | Unit 1mm |
 
 ---
 
@@ -411,15 +338,6 @@ Unit modes: 0.1mm (icon 1), 0.01mm (icon 2)
 | Multifile (file) | 24 | Toggle multifile mode | `MainPageKey` (0x1002) | 8 / 9 |
 | Brightness slider (h0) | 9 | Set backlight brightness | — | — |
 
-### Key Actions
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `SettingScreenKey` | 0x0D | 42/88 | Read PLR enabled/disabled state, navigate to multiset |
-| `PowerContinuePrintKey` | 1-3 | 42/88 | PLR enable/disable, resume, cancel |
-| `MainPageKey` | 8 | 42/88 | Set `Multifile_flag=false` (single file mode) |
-| `MainPageKey` | 9 | 42/88 | Set `Multifile_flag=true` (multi-file mode) |
-
 ### Model Detection (`main.va0.val`)
 | Value | Model |
 |-------|-------|
@@ -450,19 +368,6 @@ Selected language highlighted with icon `133`, others show `70`.
 | Button | ID | Display Side Action | Key Enum | Key Data |
 |--------|----|---------------------|----------|----------|
 | Language options (8 icons) | — | Select language | `SelectLanguageKey` (0x105C) | 1-8 |
-
-### Key Actions
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `SelectLanguageKey` | 1 | 70 | Chinese (Simplified) |
-| `SelectLanguageKey` | 2 | 70 | English |
-| `SelectLanguageKey` | 3 | 70 | Spanish |
-| `SelectLanguageKey` | 4 | 70 | French |
-| `SelectLanguageKey` | 5 | 70 | Italian |
-| `SelectLanguageKey` | 6 | 70 | Russian |
-| `SelectLanguageKey` | 7 | 70 | German |
-| `SelectLanguageKey` | 8 | 70 | Japanese |
 
 ---
 
@@ -533,13 +438,6 @@ Selected language highlighted with icon `133`, others show `70`.
 | Reset bed level | — | Reset leveling | `BedLevelFunKey` (0x1044) | 0x14 |
 | Save EEPROM | — | Save settings | `BedLevelFunKey` (0x1044) | 0x15 |
 | Refresh after resume | — | Refresh printpause | `BedLevelFunKey` (0x1044) | 0x16 |
-
-### Key Actions (Page 181)
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `BedLevelFunKey` | 10 | 349 | Update printpause page info (speed, time, percent) |
-| `BedLevelFunKey` | 11 | 349 | Update main screen temps |
 
 ### Leveling Mesh Screens (Pages 771/784/797/810/823/836/849)
 
@@ -684,12 +582,6 @@ Selected language highlighted with icon `133`, others show `70`.
 | ±Y movement | — | Move Y axis | `YaxismoveKey` (0x104A) | 1 / 2 |
 | ±Z movement | — | Move Z axis | `ZaxismoveKey` (0x104C) | 1 / 2 |
 | Tool change | — | T0/T1 | `SelectExtruderKey` (0x104E) | 1 / 2 |
-
-### Key Actions (Page 407)
-
-| Key Enum | Key Data | Origin Page | Action |
-|----------|----------|-------------|--------|
-| `HardwareTest` | — | 407 | Tests nozzle temp, bed temp, fan speed, SD card, motor test, LCD version |
 
 ---
 
@@ -839,3 +731,94 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `ICON_ADJUST_PRINTING_S_F_UNIT` | S/F unit icon |
 | `ICON_ADJUST_Z_OFFSET_UNIT` | Z-offset unit icon |
 | `ICON_LEVEL_SELECT` | Level select icon |
+
+---
+
+## Key Actions Reference
+
+| Key Enum | Key Data | Page(s) | Action |
+|----------|----------|---------|--------|
+| `MainPageKey` | 1 | 0 | SD card update, navigate to `printfiles` (multifile) or `file1` (single), or `nosdcard` if no card |
+| `MainPageKey` | 2 | 0 | Abort print: clear queue, quickstop steppers, stop timers, reset progress/time VPs |
+| `MainPageKey` | 3 | 0 | Toggle fan icon (head0 and head1) |
+| `MainPageKey` | 4 | 0 | Update filament sensor icon based on `enable_filment_check` |
+| `MainPageKey` | 5 | 0 | Update dual X carriage mode icons (two-color/copy/mirror/single) |
+| `MainPageKey` | 6 | 0 | SD card file list refresh |
+| `MainPageKey` | 8 | 0, 42/88 | Set `Multifile_flag=false` (single file mode) |
+| `MainPageKey` | 9 | 0, 42/88 | Set `Multifile_flag=true` (multi-file mode) |
+| `SelectFileKey` | file index (0-7) | 1-5, 8 | Touch release on file row to select file |
+| `AdjustmentKey` | 1 | 10/11/12 | Navigate to `adjusttemp` page |
+| `AdjustmentKey` | 2 | 10/11/12 | Show correct pause page (10/11/12) based on print state |
+| `AdjustmentKey` | 6 | 28/51 | Navigate to speed screen: `speed_ctrl=1`, send feedrate % |
+| `AdjustmentKey` | 7 | 28/51 | Navigate to Z-offset screen, set unit to 0.1mm |
+| `AdjustmentKey` | 8 | 52 | Reset speed: `motion.feedrate_percentage=100` |
+| `AdjustmentKey` | 9 | 52 | Reset flow: `planner.flow_percentage[0]=100` |
+| `AdjustmentKey` | 0x0A | 52 | Fan full: `thermalManager.fan_speed[0]=255` |
+| `StopPrintKey` | 0xF0 | 10/11/12 | Show appropriate pause page (11 if printing, 12 if SD paused, 10 otherwise) |
+| `PausePrintKey` | 0xF1 | 10/11/12 | Pause print: set `waitway=1`, call `ExtUI::pausePrint()`, show wait page |
+| `PausePrintKey` | 0x01 | 10/11/12, 25 | Show `pauseconfirm` page if still printing / Confirm pause |
+| `ResumePrintKey` | 1 | 10/11/12 | Resume print: check filament, enqueue G92.9 E, call `ExtUI::resumePrint()`, show page 11 |
+| `ResumePrintKey` | 2 | 10/11/12 | M600 filament change resume: check filament, preheat if needed, send M23/M24 |
+| `ResumePrintKey` | 3 | 10/11/12 | Power loss recovery resume: update filament icons, call `marlin.user_resume()`, show `filamentresume` |
+| `ResumePrintKey` | 4 | 10/11/12 | SD card resume: mount card, start/resume file printing, show page 11 |
+| `TempScreenKey` | 1 | 28/51 | Select nozzle tab: `temp_ctrl=1`, send nozzle target to display |
+| `TempScreenKey` | 3 | 28/51 | Select bed tab: `temp_ctrl=0`, send bed target to display |
+| `TempScreenKey` | 5 | 28/51 | Unit 1°C: `unit=1`, update icon |
+| `TempScreenKey` | 6 | 28/51 | Unit 5°C: `unit=5`, update icon |
+| `TempScreenKey` | 7 | 28/51 | Unit 10°C: `unit=10`, update icon |
+| `TempScreenKey` | 8 | 28/51 | ++ temperature: increment target by `unit` |
+| `TempScreenKey` | 9 | 28/51 | -- temperature: decrement target by `unit` |
+| `TempScreenKey` | 0x0A | 28/51 | Speed tab: `speed_ctrl=1`, navigate to `adjustspeed` |
+| `TempScreenKey` | 0x0B | 28/51 | Flow tab: `speed_ctrl=2`, navigate to `adjustspeed` |
+| `TempScreenKey` | 0x0C | 28/51 | Fan tab: `speed_ctrl=3`, navigate to `adjustspeed` |
+| `TempScreenKey` | 0x0D | 28/51 | ++ speed/flow/fan: increment based on `speed_ctrl` |
+| `TempScreenKey` | 0x0E | 28/51 | -- speed/flow/fan: decrement based on `speed_ctrl` |
+| `TempScreenKey` | 0x0F | 28/51 | Advanced set max speed: `advaned_set=1` |
+| `TempScreenKey` | 0x10 | 28/51 | Advanced set max accel: `advaned_set=2` |
+| `TempScreenKey` | 0x11-0x14 | 28/51 | -- max feedrate/accel for X/Y/Z/E axes |
+| `TempScreenKey` | 0x15-0x18 | 28/51 | ++ max feedrate/accel for X/Y/Z/E axes |
+| `TempScreenKey` | 0xF1 | 28/51 | Cancel all: clear all targets, navigate to page 15 |
+| `TempScreenKey` | 0xF0 | 28/51 | Cancel: navigate to page 15 |
+| `Heater0TempEnterKey` | temp value | 28/51 | Set hotend 0 target temperature (byte-swap on TJC displays) |
+| `HotBedTempEnterKey` | temp value | 28/51 | Set bed target temperature (byte-swap on TJC displays) |
+| `SettingScreenKey` | 0x0A | 28/51 | Navigate to `prefilament` page |
+| `SettingScreenKey` | 2 | 28/51 | Filament preheat |
+| `SettingScreenKey` | 0x0D | 42/88 | Read PLR enabled/disabled state, navigate to multiset |
+| `ZOffsetKey` | signed 16-bit / 100 | 53 | Apply babystepping, update `probe.offset.z` |
+| `BedLevelFunKey` | 1 | 349 | Home Z for leveling |
+| `BedLevelFunKey` | 2 | 349 | Increment zprobe_zoffset |
+| `BedLevelFunKey` | 3 | 349 | Decrement zprobe_zoffset |
+| `BedLevelFunKey` | 4 | 53, 349 | Unit 0.01mm |
+| `BedLevelFunKey` | 5 | 53, 349 | Unit 0.1mm |
+| `BedLevelFunKey` | 6 | 53, 349 | Unit 1mm |
+| `BedLevelFunKey` | 7 | 34/75, 349 | Toggle LED2 |
+| `BedLevelFunKey` | 8 | 34/75, 10/11/12 | Toggle caselight / LED3 |
+| `BedLevelFunKey` | 9 | 349 | Run G29 auto-level |
+| `BedLevelFunKey` | 10 | 349 | Update printpause page info (speed, time, percent) |
+| `BedLevelFunKey` | 11 | 349 | Update main screen temps |
+| `BedLevelFunKey` | 12 | 349 | Model info |
+| `BedLevelFunKey` | 0x0D-0x13 | 349 | Move to leveling mesh points 1-7 |
+| `BedLevelFunKey` | 0x14 | 349 | Reset leveling |
+| `BedLevelFunKey` | 0x15 | 349 | Save EEPROM settings |
+| `BedLevelFunKey` | 0x16 | 349 | Refresh printpause after resume |
+| `PowerContinuePrintKey` | 1-3 | 42/88 | PLR enable/disable, resume, cancel |
+| `SelectLanguageKey` | 1 | 70 | Chinese (Simplified) |
+| `SelectLanguageKey` | 2 | 70 | English |
+| `SelectLanguageKey` | 3 | 70 | Spanish |
+| `SelectLanguageKey` | 4 | 70 | French |
+| `SelectLanguageKey` | 5 | 70 | Italian |
+| `SelectLanguageKey` | 6 | 70 | Russian |
+| `SelectLanguageKey` | 7 | 70 | German |
+| `SelectLanguageKey` | 8 | 70 | Japanese |
+| `Err_Control` | — | 433-615 | Dismiss error/warning screen |
+| `AxisPageSelectKey` | 1 / 2 / 3 | 381/394/407 | Unit selection: 0.1mm / 1mm / 10mm |
+| `AxisPageSelectKey` | 4 / 5 / 6 / 7 | 381/394/407 | G28 full/axis homing |
+| `XaxismoveKey` | 1 / 2 | 381/394/407 | ±X movement |
+| `YaxismoveKey` | 1 / 2 | 381/394/407 | ±Y movement |
+| `ZaxismoveKey` | 1 / 2 | 381/394/407 | ±Z movement |
+| `SelectExtruderKey` | 1 / 2 | 381/394/407 | T0/T1 tool change |
+| `HardwareTest` | — | 407 | Tests nozzle temp, bed temp, fan speed, SD card, motor test, LCD version |
+| `SetPreNozzleTemp` | 1 / 2 | 745/758 | Adjust preset nozzle temp: -/+ |
+| `SetPreBedTemp` | 1 / 2 | 745/758 | Adjust preset bed temp: -/+ |
+| `Heater0LoadEnterKey` | length value | 218/262 | Set filament load length |
+| `Heater1LoadEnterKey` | speed value | 218/262 | Set filament load speed |
