@@ -94,6 +94,10 @@ void GcodeSuite::M600() {
     LCD_SERIAL_2.printf("noFilamentPush.t0.txt=\"M600 Trigger\"");
     LCD_SERIAL_2.printf("\xff\xff\xff");
 
+    // IMMEDIATE PAUSE - stop SD card reading now
+    RTS_ImmediatePause();
+    RTS_M600_Flag = false;
+
   #else
 
   #if ENABLED(MIXING_EXTRUDER)
