@@ -3341,6 +3341,11 @@
               #endif
             }
 
+            if (RTS_M600_Flag) {
+                      marlin.user_resume();
+                      RTS_M600_Flag = false;
+                    }
+
             char cmd[30];
             char *c;
             sprintf_P(cmd, PSTR("M23 %s"), CardRecbuf.Cardfilename[FilenamesCount]);

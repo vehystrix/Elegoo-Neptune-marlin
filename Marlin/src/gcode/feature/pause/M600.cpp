@@ -96,7 +96,6 @@ void GcodeSuite::M600() {
 
     // IMMEDIATE PAUSE - stop SD card reading now
     RTS_ImmediatePause();
-    RTS_M600_Flag = false;
 
   #endif
 
