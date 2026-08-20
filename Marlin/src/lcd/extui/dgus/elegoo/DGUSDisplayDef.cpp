@@ -2268,8 +2268,6 @@
   uint8_t pause_count_pos = 0;
 
   void RTS_ImmediatePause() {
-    card.pauseSDPrint();
-    print_job_timer.pause();
     pause_action_flag = true;
     sdcard_pause_check = false;
     waitway = 5;

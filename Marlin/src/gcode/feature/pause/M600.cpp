@@ -98,7 +98,7 @@ void GcodeSuite::M600() {
     RTS_ImmediatePause();
     RTS_M600_Flag = false;
 
-  #else
+  #endif
 
   #if ENABLED(MIXING_EXTRUDER)
     const int8_t eindex = get_target_e_stepper_from_command();
@@ -210,7 +210,6 @@ void GcodeSuite::M600() {
 
   TERN_(MIXING_EXTRUDER, mixer.T(old_mixing_tool)); // Restore original mixing tool
 
-  #endif  // NOT TJC_AVAILABLE
 }
 
 #endif // ADVANCED_PAUSE_FEATURE
