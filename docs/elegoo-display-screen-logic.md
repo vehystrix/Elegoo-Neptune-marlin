@@ -11,6 +11,300 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 
 ---
 
+## Nextion .txt File Structure
+
+The `.txt` files are Nextion editor project files that define screens (pages) and their components. Each file corresponds to one screen/page on the display.
+
+### File Header
+
+Every `.txt` file begins with a `Page` declaration:
+
+```nextion
+Page <page_name>
+    Attributes
+        ID                 : <page_id>
+        Scope              : local
+        Send Component ID  : disabled
+        Opacity            : 127
+        Width              : <screen_width>
+        Effect             : load
+        Locked             : no
+        Swide up/down/left/right page ID : disabled
+        Fill               : picture|no background (transparent)
+        Back. Picture ID   : <background_picture_id>
+```
+
+### Component Types
+
+Nextion components fall into four categories:
+
+| Type | Example | Description |
+|------|---------|-------------|
+| `Text` | `t0`, `t1`, `level_heating` | Label text, numbers, status messages |
+| `Variable` (int32) | `va0`, `va1` | Numeric state variables (buttons, flags, counters) |
+| `Picture` | `logo`, `plr`, `p0` | Image objects, icons, backgrounds |
+| `Crop Picture` | `q0`, `q1`, `q2` | Sliced image regions for button states |
+| `Hotspot` | `m0`, `m1`, `m2`, `m3` | Invisible touch regions for large hit areas |
+| `Button` / `Key` | Implicit via touch events | Interactive touch regions |
+
+### Hotspot Components
+
+`Hotspot` components are invisible touch-sensitive regions that overlay visual elements. They are used to create large, easy-to-press touch areas that may extend beyond the visible button boundaries.
+
+```nextion
+Hotspot m0
+    Attributes
+        ID               : 18
+        Scope            : local
+        Dragging         : 0
+        Send Component ID: disabled
+        Opacity          : 127
+        x coordinate     : 17
+        y coordinate     : 105
+        Width            : 105
+        Height           : 98
+        Effect           : load
+    
+    Events
+        Touch Press Event
+            if(en_files==1)
+            {
+                printh 5A A5
+                printh 06
+                printh 83
+                printh 10 02
+                printh 01
+                printh 00 09
+            }else
+            {
+                printh 5A A5
+                printh 06
+                printh 83
+                printh 10 02
+                printh 01
+                printh 00 08
+            }
+            q0.picc=29
+            if(en_beep==1)
+            {
+                beep 50
+            }
+            if(en_dim==1)
+            {
+                rest_count=0
+                tm_rest.en=1
+                dim=multiset.h0.val
+            }
+        
+        Touch Release Event
+            printh 5A A5
+            printh 06
+            printh 83
+            printh 10 02
+            printh 01
+            printh 00 01
+            q0.picc=0
+```
+
+**Key characteristics:**
+- **No visual attributes** — Hotspots have no `Fill`, `Picture ID`, or `Text`; they are completely invisible
+- **Large touch areas** — Width/Height often larger than underlying visual elements for easier tapping
+- **Touch events** — Typically define both `Touch Press Event` and `Touch Release Event`
+- **Visual feedback** — On press, change a nearby `Crop Picture`'s `picc` (pressed color) attribute; on release, reset it
+- **Serial communication** — Send DGUS commands via `printh` to notify Marlin of user actions
+- **Naming convention** — Typically `m0`, `m1`, `m2`, `m3` matching the button IDs in the documentation
+
+**Common actions in Hotspot events:**
+| Action | Purpose |
+|--------|---------|
+| `printh 5A A5 ...` | Send DGUS frame to Marlin (read variable, send key) |
+| `q0.picc=29` | Show pressed state visual feedback |
+| `q0.picc=0` | Reset to normal state on release |
+| `beep 50` | Play confirmation beep (if enabled) |
+| `rest_count=0` | Reset idle timeout timer |
+| `tm_rest.en=1` | Enable rest timer |
+| `dim=multiset.h0.val` | Update screen brightness |
+| `page <name>` | Navigate to another page |
+
+### Component Attributes
+
+Components define their properties via attribute blocks:
+
+```nextion
+Text t0
+    Attributes
+        ID                      : 8
+        Scope                   : local
+        Dragging                : 0
+        Send Component ID       : disabled
+        Opacity                 : 127
+        x coordinate            : 7
+        y coordinate            : 365
+        Width                   : 258
+        Height                  : 30
+        Effect                  : load
+        Fill                    : transparent
+        Associated Keyboard     : none
+        Font ID                 : 0
+        Back. Color             : 65535
+        Cropped Back. Picture ID: 65535
+        Back. Picture ID        : 65535
+        Font Color              : 65535
+        Horizontal Alignment    : left
+        Vertical Alignment      : center
+        Input Type              : character
+        Text                    : 
+        Max. Text Size          : 64
+        Word wrap               : disabled
+        Horizontal Spacing      : 0
+        Vertical Spacing        : 0
+```
+
+### Events
+
+The `Events` block defines behavior triggered by page lifecycle and user interaction:
+
+```nextion
+Events
+    Preinitialize Event
+        // Runs once when the page is first loaded
+        if(en_dim==1)
+        {
+            tm_rest.en=1
+        }
+        t1.font=0
+        t2.font=0
+        if(langue==0)
+        {
+            t1.txt="Settings"
+        }
+    
+    Touch Press Event
+        // Runs when user touches any component on the page
+        if(en_dim==1)
+        {
+            rest_count=0
+            tm_rest.en=1
+            dim=multiset.h0.val
+        }
+```
+
+Common event patterns:
+- **Preinitialize Event**: Language detection, fan icon toggling, timer enable/disable
+- **Touch Press Event**: Reset idle timer (`rest_count=0`), update brightness (`dim`)
+- **Variable Value Change Event**: React to state changes (not shown in these files but used in the C++ layer)
+
+### Communication Commands
+
+Nextion language commands embedded in `.txt` files:
+
+| Command | Purpose |
+|---------|---------|
+| `printh 5A A5` | Send frame header |
+| `printh 08` | Frame length |
+| `printh 83 10 40 02 00 07` | Read variable command (`0x83`) |
+| `prints main.version.val,1` | Send variable value as string |
+| `com_stop` | Stop serial communication |
+| `com_star` | Start serial communication |
+
+### Variable Addressing
+
+Variables are referenced using dot notation:
+
+```nextion
+main.version.val       // Variable "version" on page "main"
+printpause.va0.val     // Variable "va0" on page "printpause"
+multiset.h0.val        // Slider "h0" on page "multiset"
+leveling.va1.val       // Variable "va1" on page "leveling"
+```
+
+### Page Navigation
+
+Pages navigate to each other using:
+- `wepo <page_id>,<timeout_ms>` — Wait and then navigate (used for auto-return)
+- Direct component picture swaps (`pic=`) to show/hide overlays
+
+### Scope
+
+| Scope | Description |
+|-------|-------------|
+| `local` | Variable exists only on this page |
+| `global` | Variable accessible from any page |
+
+### Example Structure
+
+```nextion
+Page main
+    Attributes
+        ID                 : 0
+        Scope              : local
+        Width              : 272
+        Effect             : load
+        Fill               : picture
+        Back. Picture ID   : 0
+    
+    Events
+        Preinitialize Event
+            if(en_dim==1) { tm_rest.en=1 }
+            t0.font=0
+            t1.font=0
+            if(langue==0) { t0.txt="Print"; t1.txt="Prepare" }
+            else if(langue==1) { t0.txt="Print"; t1.txt="Prepare" }
+    
+    Variable (int32) va0
+        Attributes
+            ID   : 3
+            Scope: global
+            Value: 0
+    
+    Variable (int32) va1
+        Attributes
+            ID   : 7
+            Scope: local
+            Value: 0
+    
+    Text t0
+        Attributes
+            ID   : 8
+            Scope: local
+            x coordinate: 7
+            y coordinate: 365
+            Width  : 258
+            Height : 30
+            Font ID: 0
+            Text   : 
+```
+
+---
+
+## Known Issues
+
+### Code Bugs (DGUSDisplayDef.cpp)
+
+| Issue | Location | Description | Severity |
+|-------|----------|-------------|----------|
+| Duplicate variable declaration | DUAL_X_CARRIAGE block, ~line 137 | `float motion.position_x1_axis` declared twice — second declaration shadows first | **Low** — compiler warning, potential logic error |
+
+### Screen Text Issues (Nextion Files)
+
+| Screen | Issue | Description |
+|--------|-------|-------------|
+| `err_bedover.txt` (459) | Russian text error | Russian text describes low temperature instead of overheat (copy-paste from `err_bedunder.txt`) |
+| `err_bedunder.txt` (472) | English description error | Says "short-circuited" instead of "open circuit" or "disconnected" |
+| `err_nozzleover.txt` (498) | German/Russian text error | German and Russian texts describe low temperature instead of overheat |
+| `err_nozzleunde.txt` (511) | English description error | Says "short-circuited" instead of "open circuit" or "disconnected" |
+| `err_sdwrite.txt` (576) | French text error | French text says "Erreur de lecture SD" (read error) instead of write error |
+
+### Non-Functional Screens
+
+| Screen | Status |
+|--------|--------|
+| `leveldata_64.txt` (927) | **Transparent/empty** — no mesh variables, source code in G29.cpp commented out |
+| `aux64_data.txt` (966) | **Transparent/empty** — no mesh variables, source code commented out |
+| `leveldata_aux.txt` (862) | **Transparent/empty** — no content defined |
+
+---
+
 ## Screen Map
 
 | Page ID | Nextion File | Description |
@@ -132,7 +426,9 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 - Nozzle temp: `main.nozzletemp.txt` = `"current / target"` (e.g., `"200 / 200"`)
 - Bed temp: `main.bedtemp.txt` = `"current / target"`
 - X axis: `main.xvalue.val` = position × 100
-- Y/Z coordinates updated via `RTS_SndData`
+- Y axis: `main.yvalue.val` = position × 100
+- Z axis (main): `main.zvalue.val` = position × 1000
+- Z axis (printpause): `printpause.zvalue.val` = position × 100 (version ≥142) or ×10 (older)
 
 ### Buttons
 
@@ -190,7 +486,7 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 | Printing (t4) | — | Status indicator | — | — |
 
 ### Pause Flow
-1. User presses Pause → `PausePrintKey` case
+1. User presses Pause → `PausePrintKey` case with data=0xF1
 2. `waitway = 1` (block input), `pause_action_flag = true`
 3. Show `wait.txt` (Page 27)
 4. `ExtUI::pausePrint()` called
@@ -198,20 +494,21 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 
 ### Resume Flow (`ResumePrintKey` case, data[0] == 1)
 1. Check filament sensor
-2. Send `G92.9 E<pause_e>` to restore extruder position
-3. Call `ExtUI::resumePrint()`
+2. Enqueue saved command buffer (commented-out G92.9 E command)
+3. If `isPrintingFromMediaPaused()`, call `ExtUI::resumePrint()`
 4. Update time, set `sdcard_pause_check = true`
 5. Show Page 11
 
-### M600 Filament Change Resume (data[0] == 3)
-1. Update filament sensor icons
+### M600 Filament Change Resume (data[0] == 2)
+1. Check filament sensor — if no filament, show Page 39 (`nofilament.txt`)
+2. If preheat needed: send `M109 S200` (or `M109 T0 S200\nM109 T1 S200` for dual-X)
+3. Enqueue `M23 <filename>` + `M24`
+4. Set `PoweroffContinue = true`
+
+### Power Loss Recovery Resume (data[0] == 3)
+1. Update filament sensor icons based on pin reads
 2. If `RTS_M600_Flag` → call `marlin.user_resume()`, clear flag
 3. Show Page 680 (`filamentresume.txt`)
-
-### Power Loss Continue Resume (data[0] == 4)
-1. Restore file name, send `M23 <filename>` (lowercase) + `M24`
-2. Show pause screen with picture preview
-3. Set `PoweroffContinue = true`
 
 ### Confirmation Dialogs
 
@@ -219,13 +516,15 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 
 | Button | Key Enum | Key Data |
 |--------|----------|----------|
-| Confirm/Cancel | `PausePrintKey` (0x100A) | 0x01 |
+| Confirm | `PausePrintKey` (0x100A) | 0xF1 |
+| Cancel | `PausePrintKey` (0x100A) | 0xF0 |
 
 **Stop/Resume Confirmation (Page 26 — `resumeconfirm.txt`)**
 
 | Button | Key Enum | Key Data |
 |--------|----------|----------|
-| Confirm/Cancel | `StopPrintKey` (0x1008) | 1 / 0xF1 / 0xF0 |
+| Confirm | `StopPrintKey` (0x1008) | 0xF1 |
+| Cancel | `StopPrintKey` (0x1008) | 0xF0 |
 
 ---
 
@@ -258,7 +557,7 @@ The Elegoo Neptune 3 Pro / Plus / Max uses a Nextion-style DGUS display connecte
 | Unload icon (q4) | 5 | — | — | — |
 | Speed icon (q5) | 1 | Navigate to speed adjustment | `AdjustmentKey` (0x1004) | 6 |
 | Z-offset icon (q6) | 2 | Navigate to Z-offset adjustment | `AdjustmentKey` (0x1004) | 7 |
-| Adjust icon (q7) | 3 | Advanced accel/speed settings | `TempScreenKey` (0x1030) | 0x0F / 0x10 |
+| Adjust icon (q7) | 3 | Advanced speed/accel settings: 0x0F=speed, 0x10=accel | `TempScreenKey` (0x1030) | 0x0F / 0x10 |
 | Filament icon (q8) | 8 | Navigate to filament screen | `SettingScreenKey` (0x103E) | 2 |
 | targettemp (number box) | 20 | Set target temperature | `Heater0TempEnterKey` (0x1034) / `HotBedTempEnterKey` (0x103A) | temp value |
 
@@ -379,9 +678,11 @@ Selected language highlighted with icon `133`, others show `70`.
 | Machine | `PRINTER_MACHINE_TEXT_VP` (model name) |
 | Size | `PRINTER_PRINTSIZE_TEXT_VP` (X×Y×Z) |
 | Firmware Version | `SOFTVERSION` |
-| UI Version | `LCDVERSION` (optional) |
+| UI Version | Hardcoded "V1.4.2" or "V1.4.1" based on `main.version.val` |
 | Manufacturer | `CORP_WEBSITE` |
 | Contact | Website URL |
+
+> **Note**: The UI version is hardcoded in the screen file rather than dynamically reading `LCDVERSION`.
 
 ---
 
@@ -410,11 +711,13 @@ Selected language highlighted with icon `133`, others show `70`.
 - Shows Z-offset value: `leveldata.z_offset.val = zprobe_zoffset * 100`
 - Shows mesh points: `leveldata.x0.val` through `leveldata.x11.val`
 - Values ≥ 2647 are cleared to 0
-
-### Model-specific mesh screens
-| Model | Screen File | Points |
-|-------|------------|--------|
-| Neptune 3 Pro | `leveling_36.txt` / `leveldata_36.txt` | 6×6 |
+ Status |
+|-------|------------|--------|--------|
+| Neptune 3 Pro | `leveling_36.txt` / `leveldata_36.txt` | 6×6 | ✅ Functional |
+| Neptune 3 Plus | `leveling_49.txt` / `aux49_data.txt` | 7×7 | ✅ Functional |
+| Neptune 3 Max | `leveling_63.txt` / `aux63_data.txt` | 8×8 | ✅ Functional |
+| — | `leveling_64.txt` / `leveldata_64.txt` | 8×8 | ❌ **Non-functional** — screen is transparent, source code commented out |
+| — | `leveldata_aux.txt` | — | ❌ **Non-functional** — screen is transparent, no content×6 |
 | Neptune 3 Plus | `leveling_49.txt` / `aux49_data.txt` | 7×7 |
 | Neptune 3 Max | `leveling_63.txt` / `aux63_data.txt` | 8×8 |
 
@@ -749,6 +1052,9 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `SelectFileKey` | file index (0-7) | 1-5, 8 | Touch release on file row to select file |
 | `AdjustmentKey` | 1 | 10/11/12 | Navigate to `adjusttemp` page |
 | `AdjustmentKey` | 2 | 10/11/12 | Show correct pause page (10/11/12) based on print state |
+| `AdjustmentKey` | 3 | 10/11/12 | Toggle fan icon (head0) |
+| `AdjustmentKey` | 4 | 10/11/12 | Toggle fan2 icon (head1) |
+| `AdjustmentKey` | 5 | 10/11/12 | Navigate to `adjusttemp` page (via icon) |
 | `AdjustmentKey` | 6 | 28/51 | Navigate to speed screen: `speed_ctrl=1`, send feedrate % |
 | `AdjustmentKey` | 7 | 28/51 | Navigate to Z-offset screen, set unit to 0.1mm |
 | `AdjustmentKey` | 8 | 52 | Reset speed: `motion.feedrate_percentage=100` |
@@ -760,7 +1066,6 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `ResumePrintKey` | 1 | 10/11/12 | Resume print: check filament, enqueue G92.9 E, call `ExtUI::resumePrint()`, show page 11 |
 | `ResumePrintKey` | 2 | 10/11/12 | M600 filament change resume: check filament, preheat if needed, send M23/M24 |
 | `ResumePrintKey` | 3 | 10/11/12 | Power loss recovery resume: update filament icons, call `marlin.user_resume()`, show `filamentresume` |
-| `ResumePrintKey` | 4 | 10/11/12 | SD card resume: mount card, start/resume file printing, show page 11 |
 | `TempScreenKey` | 1 | 28/51 | Select nozzle tab: `temp_ctrl=1`, send nozzle target to display |
 | `TempScreenKey` | 3 | 28/51 | Select bed tab: `temp_ctrl=0`, send bed target to display |
 | `TempScreenKey` | 5 | 28/51 | Unit 1°C: `unit=1`, update icon |
@@ -775,8 +1080,14 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `TempScreenKey` | 0x0E | 28/51 | -- speed/flow/fan: decrement based on `speed_ctrl` |
 | `TempScreenKey` | 0x0F | 28/51 | Advanced set max speed: `advaned_set=1` |
 | `TempScreenKey` | 0x10 | 28/51 | Advanced set max accel: `advaned_set=2` |
-| `TempScreenKey` | 0x11-0x14 | 28/51 | -- max feedrate/accel for X/Y/Z/E axes |
-| `TempScreenKey` | 0x15-0x18 | 28/51 | ++ max feedrate/accel for X/Y/Z/E axes |
+| `TempScreenKey` | 0x11 | 28/51 | -- max feedrate X axis |
+| `TempScreenKey` | 0x12 | 28/51 | -- max feedrate Y axis |
+| `TempScreenKey` | 0x13 | 28/51 | -- max feedrate Z axis |
+| `TempScreenKey` | 0x14 | 28/51 | -- max feedrate E axis |
+| `TempScreenKey` | 0x15 | 28/51 | ++ max feedrate X axis |
+| `TempScreenKey` | 0x16 | 28/51 | ++ max feedrate Y axis |
+| `TempScreenKey` | 0x17 | 28/51 | ++ max feedrate Z axis |
+| `TempScreenKey` | 0x18 | 28/51 | ++ max feedrate E axis |
 | `TempScreenKey` | 0xF1 | 28/51 | Cancel all: clear all targets, navigate to page 15 |
 | `TempScreenKey` | 0xF0 | 28/51 | Cancel: navigate to page 15 |
 | `Heater0TempEnterKey` | temp value | 28/51 | Set hotend 0 target temperature (byte-swap on TJC displays) |
@@ -797,11 +1108,19 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `BedLevelFunKey` | 10 | 349 | Update printpause page info (speed, time, percent) |
 | `BedLevelFunKey` | 11 | 349 | Update main screen temps |
 | `BedLevelFunKey` | 12 | 349 | Model info |
-| `BedLevelFunKey` | 0x0D-0x13 | 349 | Move to leveling mesh points 1-7 |
+| `BedLevelFunKey` | 0x0D | 349 | Move to leveling mesh point 1 |
+| `BedLevelFunKey` | 0x0E | 349 | Move to leveling mesh point 2 |
+| `BedLevelFunKey` | 0x0F | 349 | Move to leveling mesh point 3 |
+| `BedLevelFunKey` | 0x10 | 349 | Move to leveling mesh point 4 |
+| `BedLevelFunKey` | 0x11 | 349 | Move to leveling mesh point 5 |
+| `BedLevelFunKey` | 0x12 | 349 | Move to leveling mesh point 6 |
+| `BedLevelFunKey` | 0x13 | 349 | Move to leveling mesh point 7 |
 | `BedLevelFunKey` | 0x14 | 349 | Reset leveling |
 | `BedLevelFunKey` | 0x15 | 349 | Save EEPROM settings |
 | `BedLevelFunKey` | 0x16 | 349 | Refresh printpause after resume |
-| `PowerContinuePrintKey` | 1-3 | 42/88 | PLR enable/disable, resume, cancel |
+| `PowerContinuePrintKey` | 1 | 42/88 | PLR enable |
+| `PowerContinuePrintKey` | 2 | 42/88 | PLR disable |
+| `PowerContinuePrintKey` | 3 | 42/88 | PLR resume/cancel |
 | `SelectLanguageKey` | 1 | 70 | Chinese (Simplified) |
 | `SelectLanguageKey` | 2 | 70 | English |
 | `SelectLanguageKey` | 3 | 70 | Spanish |
