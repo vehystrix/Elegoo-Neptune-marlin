@@ -795,43 +795,48 @@ Selected language highlighted with icon `133`, others show `70`.
 ## Bed Leveling Screens
 
 ### `leveling.txt` (Page 349)
+> **⚠️ Non-Functional** — This page contains **no interactive components** (no Hotspots, no Text buttons, no Button components). It is a display-only page showing temperature readouts and status messages.
 - Entry point for bed leveling operations
 - Sub-modes based on `AUTO_BED_LEVELING_BILINEAR`
+
+### Buttons (Page 349)
+> **Note:** The `leveling.txt` file has **no interactive button components**. The following Key Enums are defined in firmware but not triggered by this page's UI.
+
+| Button | Key Enum | Key Data | Purpose |
+|--------|----------|----------|---------|
+| Home Z | `BedLevelFunKey` (0x1044) | 1 | Home Z for leveling |
+| Babystep +Z | `BedLevelFunKey` (0x1044) | 2 | Increment zprobe_zoffset |
+| Babystep -Z | `BedLevelFunKey` (0x1044) | 3 | Decrement zprobe_zoffset |
+| Unit 0.01mm | `BedLevelFunKey` (0x1044) | 4 | Set unit |
+| Unit 0.1mm | `BedLevelFunKey` (0x1044) | 5 | Set unit |
+| Unit 1mm | `BedLevelFunKey` (0x1044) | 6 | Set unit |
+| LED2 toggle | `BedLevelFunKey` (0x1044) | 7 | Toggle LED2 |
+| LED3/caselight | `BedLevelFunKey` (0x1044) | 8 | Toggle caselight |
+| G29 auto-level | `BedLevelFunKey` (0x1044) | 9 | Run G29 |
+| Update info | `BedLevelFunKey` (0x1044) | 10 | Refresh printpause info |
+| Update temps | `BedLevelFunKey` (0x1044) | 11 | Refresh main temps |
+| Boot/model | `BedLevelFunKey` (0x1044) | 12 | Model info |
+| Leveling points 1-7 | `BedLevelFunKey` (0x1044) | 0x0D-0x13 | Move to mesh points |
+| Reset bed level | `BedLevelFunKey` (0x1044) | 0x14 | Reset leveling |
+| Save EEPROM | `BedLevelFunKey` (0x1044) | 0x15 | Save settings |
+| Refresh after resume | `BedLevelFunKey` (0x1044) | 0x16 | Refresh printpause |
 
 ### `leveldata.txt` (Page 44/181)
 - Shows Z-offset value: `leveldata.z_offset.val = zprobe_zoffset * 100`
 - Shows mesh points: `leveldata.x0.val` through `leveldata.x11.val`
 - Values ≥ 2647 are cleared to 0
- Status |
-|-------|------------|--------|--------|
-| Neptune 3 Pro | `leveling_36.txt` / `leveldata_36.txt` | 6×6 | ✅ Functional |
-| Neptune 3 Plus | `leveling_49.txt` / `aux49_data.txt` | 7×7 | ✅ Functional |
-| Neptune 3 Max | `leveling_63.txt` / `aux63_data.txt` | 8×8 | ✅ Functional |
-| — | `leveling_64.txt` / `leveldata_64.txt` | 8×8 | ❌ **Non-functional** — screen is transparent, source code commented out |
-| — | `leveldata_aux.txt` | — | ❌ **Non-functional** — screen is transparent, no content×6 |
-| Neptune 3 Plus | `leveling_49.txt` / `aux49_data.txt` | 7×7 |
-| Neptune 3 Max | `leveling_63.txt` / `aux63_data.txt` | 8×8 |
 
-### Buttons (Page 349)
+### Leveling Mesh Screens
 
-| Button | ID | Display Side Action | Key Enum | Key Data |
-|--------|----|---------------------|----------|----------|
-| Home Z | — | Home Z for leveling | `BedLevelFunKey` (0x1044) | 1 |
-| Babystep +Z | — | Increment zprobe_zoffset | `BedLevelFunKey` (0x1044) | 2 |
-| Babystep -Z | — | Decrement zprobe_zoffset | `BedLevelFunKey` (0x1044) | 3 |
-| Unit 0.01mm | — | Set unit | `BedLevelFunKey` (0x1044) | 4 |
-| Unit 0.1mm | — | Set unit | `BedLevelFunKey` (0x1044) | 5 |
-| Unit 1mm | — | Set unit | `BedLevelFunKey` (0x1044) | 6 |
-| LED2 toggle | — | Toggle LED2 | `BedLevelFunKey` (0x1044) | 7 |
-| LED3/caselight | — | Toggle caselight | `BedLevelFunKey` (0x1044) | 8 |
-| G29 auto-level | — | Run G29 | `BedLevelFunKey` (0x1044) | 9 |
-| Update info | — | Refresh printpause info | `BedLevelFunKey` (0x1044) | 10 |
-| Update temps | — | Refresh main temps | `BedLevelFunKey` (0x1044) | 11 |
-| Boot/model | — | Model info | `BedLevelFunKey` (0x1044) | 12 |
-| Leveling points 1-7 | — | Move to mesh points | `BedLevelFunKey` (0x1044) | 0x0D-0x13 |
-| Reset bed level | — | Reset leveling | `BedLevelFunKey` (0x1044) | 0x14 |
-| Save EEPROM | — | Save settings | `BedLevelFunKey` (0x1044) | 0x15 |
-| Refresh after resume | — | Refresh printpause | `BedLevelFunKey` (0x1044) | 0x16 |
+| Model | Leveling File | Data File | Grid | Status |
+|-------|--------------|-----------|------|--------|
+| Neptune 3 Pro | `leveling_36.txt` | `leveldata_36.txt` | 6×6 | ✅ Functional |
+| Neptune 3 Plus | `leveling_49.txt` | `aux49_data.txt` | 7×7 | ✅ Functional |
+| Neptune 3 Max | `leveling_63.txt` | `aux63_data.txt` | 8×8 | ✅ Functional |
+| — | `leveling_64.txt` | `leveldata_64.txt` | 8×8 | ❌ **Non-functional** — screen is transparent, source code commented out |
+| — | `leveldata_aux.txt` | — | — | ❌ **Non-functional** — screen is transparent, no content |
+| — | `leveling_16.txt` | `leveldata_16.txt` | 4×4 | ❌ **Non-functional** — empty stub |
+| — | `leveling_25.txt` | `leveldata_25.txt` | 5×5 | ❌ **Non-functional** — empty stub |
 
 ### Leveling Mesh Screens (Pages 771/784/797/810/823/836/849)
 
@@ -936,23 +941,23 @@ Selected language highlighted with icon `133`, others show `70`.
 
 ### Error Screen Keys (Pages 433-615)
 
-| Page | File | Condition | Key Enum | Key Data |
-|------|------|-----------|----------|----------|
-| 433 | `err_heatfail.txt` | Heater failure | `Err_Control` (0x2203) | — |
-| 446 | `err_bedheat.txt` | Bed not reaching target | `Err_Control` (0x2203) | — |
-| 459 | `err_bedover.txt` | Bed overheat | `Err_Control` (0x2203) | — |
-| 472 | `err_bedunder.txt` | Bed underheat | `Err_Control` (0x2203) | — |
-| 485 | `err_nozzleheat.txt` | Nozzle not reaching target | `Err_Control` (0x2203) | — |
-| 498 | `err_nozzleover.txt` | Nozzle overheat | `Err_Control` (0x2203) | — |
-| 511 | `err_nozzleunde.txt` | Nozzle underheat | `Err_Control` (0x2203) | — |
-| 524 | `err_homefail.txt` | Homing failure | `Err_Control` (0x2203) | — |
-| 537 | `err_probefail.txt` | Probe failure | `Err_Control` (0x2203) | — |
-| 550 | `err_sd.txt` | SD card error | `Err_Control` (0x2203) | — |
-| 563 | `err_sdread.txt` | SD read error | `Err_Control` (0x2203) | — |
-| 576 | `err_sdwrite.txt` | SD write error | `Err_Control` (0x2203) | — |
-| 589 | `warn_aux.txt` | Auxiliary warning | `Err_Control` (0x2203) | — |
-| 602 | `warn_rdlevel.txt` | Read level warning | `Err_Control` (0x2203) | — |
-| 615 | `warn_zoffset.txt` | Z-offset warning | `Err_Control` (0x2203) | — |
+| Page | File | Condition | Key Enum | Key Data | Component Type |
+|------|------|-----------|----------|----------|---------------|
+| 433 | `err_heatfail.txt` | Heater failure | `Err_Control` (0x2203) | — | Display-only (no interactive buttons) |
+| 446 | `err_bedheat.txt` | Bed not reaching target | `Err_Control` (0x2203) | — | Display-only (no interactive buttons) |
+| 459 | `err_bedover.txt` | Bed overheat | `Err_Control` (0x2203) | — | Display-only (no interactive buttons) |
+| 472 | `err_bedunder.txt` | Bed underheat | `Err_Control` (0x2203) | — | **Hotspot m0** (ID 6) + **Text t1** (ID 2) |
+| 485 | `err_nozzleheat.txt` | Nozzle not reaching target | `Err_Control` (0x2203) | — | Display-only (no interactive buttons) |
+| 498 | `err_nozzleover.txt` | Nozzle overheat | `Err_Control` (0x2203) | — | Display-only (no interactive buttons) |
+| 511 | `err_nozzleunde.txt` | Nozzle underheat | `Err_Control` (0x2203) | — | **Hotspot m0** (ID 5) + **Text t0** (ID 4) |
+| 524 | `err_homefail.txt` | Homing failure | `Err_Control` (0x2203) | — | Display-only (no interactive buttons) |
+| 537 | `err_probefail.txt` | Probe failure | `Err_Control` (0x2203) | — | **Hotspot m0** (ID 5) + **Text t1** (ID 2) |
+| 550 | `err_sd.txt` | SD card error | `Err_Control` (0x2203) | — | **Text t0** (ID 4) button |
+| 563 | `err_sdread.txt` | SD read error | `Err_Control` (0x2203) | — | **Text t0** (ID 4) button |
+| 576 | `err_sdwrite.txt` | SD write error | `Err_Control` (0x2203) | — | **Text t0** (ID 4) button |
+| 589 | `warn_aux.txt` | Auxiliary warning | `Err_Control` (0x2203) | — | **Text t4** (ID 3) + **Text t5** (ID 7) |
+| 602 | `warn_rdlevel.txt` | Read level warning | `Err_Control` (0x2203) | — | **Text t2** (ID 3) + **Text t3** (ID 4) |
+| 615 | `warn_zoffset.txt` | Z-offset warning | `Err_Control` (0x2203) | — | **Text t4** (ID 6) button |
 
 ---
 
@@ -966,16 +971,27 @@ Selected language highlighted with icon `133`, others show `70`.
 - Motor test (via `motorsetvalue.txt`)
 - LCD version check
 
-### Buttons (Pages 381/394/407)
+### Component Type
+This page uses **native Nextion Button components** (11 total) instead of Hotspots or Text buttons.
+
+### Buttons (Page 407)
 
 | Button | ID | Display Side Action | Key Enum | Key Data |
 |--------|----|---------------------|----------|----------|
-| Unit selection | — | 0.1mm / 1mm / 10mm | `AxisPageSelectKey` (0x1046) | 1 / 2 / 3 |
-| G28 commands | — | Full/axis homing | `AxisPageSelectKey` (0x1046) | 4 / 5 / 6 / 7 |
+| Unit selection (0.1mm) | 1 | Set unit | `AxisPageSelectKey` (0x1046) | 1 |
+| Unit selection (1mm) | 2 | Set unit | `AxisPageSelectKey` (0x1046) | 2 |
+| Unit selection (10mm) | 3 | Set unit | `AxisPageSelectKey` (0x1046) | 3 |
+| G28 full homing | 4 | Full homing | `AxisPageSelectKey` (0x1046) | 4 |
+| G28 X axis | 5 | X homing | `AxisPageSelectKey` (0x1046) | 5 |
+| G28 Y axis | 6 | Y homing | `AxisPageSelectKey` (0x1046) | 6 |
+| G28 Z axis | 7 | Z homing | `AxisPageSelectKey` (0x1046) | 7 |
 | ±X movement | — | Move X axis | `XaxismoveKey` (0x1048) | 1 / 2 |
 | ±Y movement | — | Move Y axis | `YaxismoveKey` (0x104A) | 1 / 2 |
 | ±Z movement | — | Move Z axis | `ZaxismoveKey` (0x104C) | 1 / 2 |
 | Tool change | — | T0/T1 | `SelectExtruderKey` (0x104E) | 1 / 2 |
+| End test | 8 | End test | — | — |
+| Motor forward | 9 | Forward | — | — |
+| Motor reverse | 19 | Reverse | — | — |
 
 ---
 
@@ -1182,11 +1198,16 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `TempScreenKey` | 0xF1 | 28/51 | Cancel all: clear all targets, navigate to page 15 |
 | `TempScreenKey` | 0xF0 | 28/51 | Cancel: navigate to page 15 |
 | `Heater0TempEnterKey` | temp value | 28/51 | Set hotend 0 target temperature (byte-swap on TJC displays) |
+| `Heater1TempEnterKey` | temp value | 28/51 | Set hotend 1 target temperature (byte-swap on TJC displays) |
 | `HotBedTempEnterKey` | temp value | 28/51 | Set bed target temperature (byte-swap on TJC displays) |
 | `SettingScreenKey` | 0x0A | 28/51 | Navigate to `prefilament` page |
 | `SettingScreenKey` | 2 | 28/51 | Filament preheat |
 | `SettingScreenKey` | 0x0D | 42/88 | Read PLR enabled/disabled state, navigate to multiset |
+| `SettingBackKey` | 1 | 42/88 | Save settings, move Z to 15mm |
+| `SettingBackKey` | 2 | 42/88 | Apply bed leveling (M420 S1) |
+| `SettingBackKey` | 3 | 42/88 | Set hotend 1 offset (X/Y/Z) |
 | `ZOffsetKey` | signed 16-bit / 100 | 53 | Apply babystepping, update `probe.offset.z` |
+| `PrintSpeedKey` | percentage | 0 | Set print speed percentage |
 | `BedLevelFunKey` | 1 | 349 | Home Z for leveling |
 | `BedLevelFunKey` | 2 | 349 | Increment zprobe_zoffset |
 | `BedLevelFunKey` | 3 | 349 | Decrement zprobe_zoffset |
@@ -1232,3 +1253,16 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `SetPreBedTemp` | 1 / 2 | 745/758 | Adjust preset bed temp: -/+ |
 | `Heater0LoadEnterKey` | length value | 218/262 | Set filament load length |
 | `Heater1LoadEnterKey` | speed value | 218/262 | Set filament load speed |
+| `CoolScreenKey` | 1-8 | 28/51 | Preheat presets: PLA/PETG/ABS/TPU nozzle and bed |
+| `FilamentLoadKey` | 1 / 2 | 218/262 | Extrude/retract filament for load/unload |
+| `FilamentCheckKey` | 1 / 2 | 42/88 | Enable/disable filament sensor; reset load length |
+| `PrintSelectModeKey` | 1-4 | 42/88 | Dual X carriage mode: two-color/copy/mirror/single |
+| `StoreMemoryKey` | 0xF1 | 42/88 | Init EEPROM, reload settings |
+| `StoreMemoryKey` | 0xF0 | 42/88 | Save settings |
+| `XhotendOffsetKey` | signed 16-bit / 10 | 42/88 | Adjust hotend 1 X offset |
+| `YhotendOffsetKey` | signed 16-bit / 10 | 42/88 | Adjust hotend 1 Y offset |
+| `ZhotendOffsetKey` | signed 16-bit / 10 | 42/88 | Adjust hotend 1 Z offset |
+| `ChangePageKey` | — | 1-5, 8 | Refresh file list, update machine info, fan icons |
+| `PrintFileKey` | 1 | 1-5, 8 | Start print: check temps, filament, send M23 + M24 |
+| `PrintConfirm` | — | 277 | Print confirmation: check temps, filament, send M23 + M24 |
+| `PrintFiles` | file index | 8 | Select file from printfiles: show confirmation or enter dir |
