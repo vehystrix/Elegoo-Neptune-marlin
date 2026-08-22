@@ -370,12 +370,6 @@ Page main
 
 ## Known Issues
 
-### Code Bugs (DGUSDisplayDef.cpp)
-
-| Issue | Location | Description | Severity |
-|-------|----------|-------------|----------|
-| Duplicate variable declaration | DUAL_X_CARRIAGE block, ~line 137 | `float motion.position_x1_axis` declared twice — second declaration shadows first | **Low** — compiler warning, potential logic error |
-
 ### Screen Text Issues (Nextion Files)
 
 | Screen | Issue | Description |
@@ -592,9 +586,8 @@ Page main
 
 ### M600 Filament Change Resume (data[0] == 2)
 1. Check filament sensor — if no filament, show Page 39 (`nofilament.txt`)
-2. If preheat needed: send `M109 S200` (or `M109 T0 S200\nM109 T1 S200` for dual-X)
-3. Enqueue `M23 <filename>` + `M24`
-4. Set `PoweroffContinue = true`
+2. Enqueue `M23 <filename>` + `M24`
+3. Set `PoweroffContinue = true`
 
 ### Power Loss Recovery Resume (data[0] == 3)
 1. Update filament sensor icons based on pin reads
@@ -1002,7 +995,7 @@ This page uses **native Nextion Button components** (11 total) instead of Hotspo
 | `waitway` | char | Input block state (0=normal, >0=blocked) |
 | `pause_action_flag` | bool | Pause in progress |
 | `sdcard_pause_check` | bool | SD card pause state |
-| `print_preheat_check` | bool | Preheat before resume |
+| `print_preheat_check` | bool | Preheat before resume (DUAL_X_CARRIAGE only) |
 | `PoweroffContinue` | bool | Power loss recovery continue |
 | `RTS_M600_Flag` | bool | M600 filament change in progress |
 | `Home_stop_flag` | bool | Homing in progress |
@@ -1010,7 +1003,6 @@ This page uses **native Nextion Button components** (11 total) instead of Hotspo
 | `restFlag1` | uint8_t | Pause/resume state flag |
 | `restFlag2` | uint8_t | Secondary pause flag |
 | `enable_filment_check` | bool | Filament sensor enabled |
-| `save_dual_x_carriage_mode` | char | Dual X carriage mode (0-3) |
 | `Multifile_flag` | bool | Multi-file display mode |
 | `CardUpdate` | bool | SD card file list needs refresh |
 | `lcd_sd_status` | bool | Last known SD status |
@@ -1152,7 +1144,7 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `MainPageKey` | 2 | 0 | Abort print: clear queue, quickstop steppers, stop timers, reset progress/time VPs |
 | `MainPageKey` | 3 | 0 | Toggle fan icon (head0 and head1) |
 | `MainPageKey` | 4 | 0 | Update filament sensor icon based on `enable_filment_check` |
-| `MainPageKey` | 5 | 0 | Update dual X carriage mode icons (two-color/copy/mirror/single) |
+| `MainPageKey` | 5 | 0 | Update dual X carriage mode icons (two-color/copy/mirror/single) — requires DUAL_X_CARRIAGE |
 | `MainPageKey` | 6 | 0 | SD card file list refresh |
 | `MainPageKey` | 8 | 0, 42/88 | Set `Multifile_flag=false` (single file mode) |
 | `MainPageKey` | 9 | 0, 42/88 | Set `Multifile_flag=true` (multi-file mode) |
@@ -1256,7 +1248,7 @@ Runs periodically (every `RTS_UPDATE_VALUE` ms):
 | `CoolScreenKey` | 1-8 | 28/51 | Preheat presets: PLA/PETG/ABS/TPU nozzle and bed |
 | `FilamentLoadKey` | 1 / 2 | 218/262 | Extrude/retract filament for load/unload |
 | `FilamentCheckKey` | 1 / 2 | 42/88 | Enable/disable filament sensor; reset load length |
-| `PrintSelectModeKey` | 1-4 | 42/88 | Dual X carriage mode: two-color/copy/mirror/single |
+| `PrintSelectModeKey` | 1-4 | 42/88 | Dual X carriage mode: two-color/copy/mirror/single — requires DUAL_X_CARRIAGE |
 | `StoreMemoryKey` | 0xF1 | 42/88 | Init EEPROM, reload settings |
 | `StoreMemoryKey` | 0xF0 | 42/88 | Save settings |
 | `XhotendOffsetKey` | signed 16-bit / 10 | 42/88 | Adjust hotend 1 X offset |
