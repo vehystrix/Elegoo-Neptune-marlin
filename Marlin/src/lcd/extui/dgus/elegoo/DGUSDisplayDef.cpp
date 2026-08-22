@@ -4684,7 +4684,7 @@
             else if(recdat.data[0]==2)
             {
               petg_extrusion_temp = (petg_extrusion_temp - unit);
-              if(pla_extrusion_temp<160)
+              if(petg_extrusion_temp<160)
               {
                 petg_extrusion_temp = 160;
               }        
