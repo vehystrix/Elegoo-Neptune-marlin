@@ -3218,6 +3218,11 @@
                       LCD_SERIAL_2.printf("page wait");
                       LCD_SERIAL_2.printf("\xff\xff\xff");               
                     #endif
+                    
+                    if (RTS_M600_Flag) {
+                      marlin.user_resume();
+                      RTS_M600_Flag = false;
+                    } else {
 
                     //char pause_str_Z[16];
                     //char pause_str_E[16];
@@ -3238,7 +3243,7 @@
                     //card.startOrResumeFilePrinting();
 
                     ExtUI::resumePrint();
-                    
+                    }
                     print_job_timer.start();
                     Update_Time_Value = 0;
                     sdcard_pause_check = true;
@@ -3301,7 +3306,7 @@
                 #endif
               #endif
             }
-            RTS_M600_Flag = false;
+            
             RTS_SndData(ExchangePageBase + 8, ExchangepageAddr);
             #if ENABLED(TJC_AVAILABLE) 
               LCD_SERIAL_2.printf("page filamentresume");
@@ -3340,11 +3345,6 @@
                 #endif
               #endif
             }
-
-            if (RTS_M600_Flag) {
-                      marlin.user_resume();
-                      RTS_M600_Flag = false;
-                    }
 
             char cmd[30];
             char *c;
