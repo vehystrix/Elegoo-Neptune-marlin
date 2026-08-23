@@ -3224,27 +3224,27 @@
                       RTS_M600_Flag = false;
                     } else {
 
-                    //char pause_str_Z[16];
-                    //char pause_str_E[16];
+                      //char pause_str_Z[16];
+                      //char pause_str_E[16];
 
-                    // memset(pause_str_Z, 0, sizeof(pause_str_Z));
-                    // dtostrf(pause_z, 3, 2, pause_str_Z);
-                    // memset(commandbuf, 0, sizeof(commandbuf));
-                    // sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
-                    // queue.enqueue_one_now(commandbuf);
+                      // memset(pause_str_Z, 0, sizeof(pause_str_Z));
+                      // dtostrf(pause_z, 3, 2, pause_str_Z);
+                      // memset(commandbuf, 0, sizeof(commandbuf));
+                      // sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
+                      // queue.enqueue_one_now(commandbuf);
 
-                    //memset(pause_str_E, 0, sizeof(pause_str_E));
-                    //dtostrf(pause_e, 3, 2, pause_str_E);
-                    //memset(commandbuf, 0, sizeof(commandbuf));
-                    //sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
-                    queue.enqueue_one_now(commandbuf);
+                      //memset(pause_str_E, 0, sizeof(pause_str_E));
+                      //dtostrf(pause_e, 3, 2, pause_str_E);
+                      //memset(commandbuf, 0, sizeof(commandbuf));
+                      //sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
+                      queue.enqueue_one_now(commandbuf);
 
-                    //card.startFileprint();
-                    //card.startOrResumeFilePrinting();
+                      //card.startFileprint();
+                      //card.startOrResumeFilePrinting();
 
-                    ExtUI::resumePrint();
+                      ExtUI::resumePrint();
+                      print_job_timer.start();
                     }
-                    print_job_timer.start();
                     Update_Time_Value = 0;
                     sdcard_pause_check = true;
                     RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);

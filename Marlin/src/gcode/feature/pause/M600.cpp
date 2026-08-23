@@ -187,7 +187,7 @@ void GcodeSuite::M600() {
         ADVANCED_PAUSE_PURGE_LENGTH,
         beep_count,
         parser.celsiusval('R'),
-        true,
+        true && !ENABLED(TJC_AVAILABLE),
         false
         DXC_PASS
       );
