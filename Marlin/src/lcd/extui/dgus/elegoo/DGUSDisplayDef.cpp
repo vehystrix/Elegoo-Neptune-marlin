@@ -2065,7 +2065,7 @@
       enable_filment_check = runout.enabled;
     #endif
 
-    if( (enable_filment_check || RTS_M600_Flag)  && card.isStillPrinting())
+    if(enable_filment_check  && card.isStillPrinting())
     {
       #if ENABLED(CHECKFILEMENT)
          
@@ -2113,7 +2113,7 @@
             }
           #else
             {
-              if( (0 == READ(CHECKFILEMENT0_PIN)) ||  RTS_M600_Flag)
+              if(0 == READ(CHECKFILEMENT0_PIN))
               {
                 Checkfilenum++;
                 delay(5);
@@ -2266,6 +2266,13 @@
   float pause_opos = 0;
   float pause_npos = 0;
   uint8_t pause_count_pos = 0;
+
+  void RTS_M600Pause() {
+    pause_action_flag = true;
+    sdcard_pause_check = false;
+    waitway = 5;
+    RTS_PauseMoveAxisPage();
+  }
 
   void RTS_PauseMoveAxisPage()
   {
@@ -3211,28 +3218,33 @@
                       LCD_SERIAL_2.printf("page wait");
                       LCD_SERIAL_2.printf("\xff\xff\xff");               
                     #endif
-
-                    //char pause_str_Z[16];
-                    //char pause_str_E[16];
-
-                    // memset(pause_str_Z, 0, sizeof(pause_str_Z));
-                    // dtostrf(pause_z, 3, 2, pause_str_Z);
-                    // memset(commandbuf, 0, sizeof(commandbuf));
-                    // sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
-                    // queue.enqueue_one_now(commandbuf);
-
-                    //memset(pause_str_E, 0, sizeof(pause_str_E));
-                    //dtostrf(pause_e, 3, 2, pause_str_E);
-                    //memset(commandbuf, 0, sizeof(commandbuf));
-                    //sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
-                    queue.enqueue_one_now(commandbuf);
-
-                    //card.startFileprint();
-                    //card.startOrResumeFilePrinting();
-
-                    ExtUI::resumePrint();
                     
-                    print_job_timer.start();
+                    if (RTS_M600_Flag) {
+                      marlin.user_resume();
+                      RTS_M600_Flag = false;
+                    } else {
+
+                      //char pause_str_Z[16];
+                      //char pause_str_E[16];
+
+                      // memset(pause_str_Z, 0, sizeof(pause_str_Z));
+                      // dtostrf(pause_z, 3, 2, pause_str_Z);
+                      // memset(commandbuf, 0, sizeof(commandbuf));
+                      // sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
+                      // queue.enqueue_one_now(commandbuf);
+
+                      //memset(pause_str_E, 0, sizeof(pause_str_E));
+                      //dtostrf(pause_e, 3, 2, pause_str_E);
+                      //memset(commandbuf, 0, sizeof(commandbuf));
+                      //sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
+                      queue.enqueue_one_now(commandbuf);
+
+                      //card.startFileprint();
+                      //card.startOrResumeFilePrinting();
+
+                      ExtUI::resumePrint();
+                      print_job_timer.start();
+                    }
                     Update_Time_Value = 0;
                     sdcard_pause_check = true;
                     RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
@@ -3294,7 +3306,7 @@
                 #endif
               #endif
             }
-            RTS_M600_Flag = false;
+            
             RTS_SndData(ExchangePageBase + 8, ExchangepageAddr);
             #if ENABLED(TJC_AVAILABLE) 
               LCD_SERIAL_2.printf("page filamentresume");
@@ -4672,7 +4684,7 @@
             else if(recdat.data[0]==2)
             {
               petg_extrusion_temp = (petg_extrusion_temp - unit);
-              if(pla_extrusion_temp<160)
+              if(petg_extrusion_temp<160)
               {
                 petg_extrusion_temp = 160;
               }        

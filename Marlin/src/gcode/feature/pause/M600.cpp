@@ -94,7 +94,9 @@ void GcodeSuite::M600() {
     LCD_SERIAL_2.printf("noFilamentPush.t0.txt=\"M600 Trigger\"");
     LCD_SERIAL_2.printf("\xff\xff\xff");
 
-  #else
+    RTS_M600Pause();
+
+  #endif
 
   #if ENABLED(MIXING_EXTRUDER)
     const int8_t eindex = get_target_e_stepper_from_command();
@@ -184,7 +186,7 @@ void GcodeSuite::M600() {
         ADVANCED_PAUSE_PURGE_LENGTH,
         beep_count,
         parser.celsiusval('R'),
-        true,
+        true && !ENABLED(TJC_AVAILABLE),
         false
         DXC_PASS
       );
@@ -206,7 +208,6 @@ void GcodeSuite::M600() {
 
   TERN_(MIXING_EXTRUDER, mixer.T(old_mixing_tool)); // Restore original mixing tool
 
-  #endif  // NOT TJC_AVAILABLE
 }
 
 #endif // ADVANCED_PAUSE_FEATURE
