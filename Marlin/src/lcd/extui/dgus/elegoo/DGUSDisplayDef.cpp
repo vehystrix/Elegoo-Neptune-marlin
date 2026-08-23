@@ -2065,7 +2065,7 @@
       enable_filment_check = runout.enabled;
     #endif
 
-    if( (enable_filment_check || RTS_M600_Flag)  && card.isStillPrinting())
+    if(enable_filment_check  && card.isStillPrinting())
     {
       #if ENABLED(CHECKFILEMENT)
          
@@ -2113,7 +2113,7 @@
             }
           #else
             {
-              if( (0 == READ(CHECKFILEMENT0_PIN)) ||  RTS_M600_Flag)
+              if(0 == READ(CHECKFILEMENT0_PIN))
               {
                 Checkfilenum++;
                 delay(5);
@@ -2267,7 +2267,7 @@
   float pause_npos = 0;
   uint8_t pause_count_pos = 0;
 
-  void RTS_ImmediatePause() {
+  void RTS_M600Pause() {
     pause_action_flag = true;
     sdcard_pause_check = false;
     waitway = 5;

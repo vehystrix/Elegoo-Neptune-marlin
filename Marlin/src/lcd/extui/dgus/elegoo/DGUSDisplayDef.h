@@ -381,7 +381,7 @@
   // extern float current_position_x0_axis;
   // extern float current_position_x1_axis;
 
-  void RTS_ImmediatePause();
+  void RTS_M600Pause();
   void RTS_PauseMoveAxisPage();
   void RTS_AutoBedLevelPage();
   void RTS_MoveAxisHoming();
