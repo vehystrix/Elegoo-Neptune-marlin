@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 import os
+from argparse import ArgumentParser
 from datetime import date
 from pathlib import Path
-from argparse import ArgumentParser
+import subprocess
+
+PLATFORMIO_COMMAND = Path.home() / ".platformio" / "penv" / "Scripts" / "platformio.exe"
 
 # Parse command-line arguments
 parser = ArgumentParser(
@@ -70,7 +73,7 @@ def build(model: str, temp: int, debug_eeprom: bool = False, wifi: bool = False)
         wifi_define = " -DN3P_WIFI=1"
         wifi_name = "WIFI_"
 
-    os.system("platformio run --target clean -e MKS_E3_V2")
+    subprocess.run(f"{PLATFORMIO_COMMAND} run --target clean -e MKS_E3_V2", check=False)
     build_flags = os.environ.get("PLATFORMIO_BUILD_FLAGS", "")
     os.environ["PLATFORMIO_BUILD_FLAGS"] = (
         build_flags
@@ -81,7 +84,9 @@ def build(model: str, temp: int, debug_eeprom: bool = False, wifi: bool = False)
         + wifi_define
         + f" {args.buildflags}"
     )
-    os.system("platformio run -e MKS_E3_V2")
+    subprocess.run(
+        f"{PLATFORMIO_COMMAND} run -e MKS_E3_V2", env=os.environ, check=False
+    )
     os.replace(
         builddir / "ZNP_ROBIN_NANO.bin",
         outdir / f"{model}_{tempname}{wifi_name}{debug_name}ZNP_ROBIN_NANO.bin",
@@ -105,7 +110,7 @@ for model in models:
     for temp in temperatures:
         build(model, temp, debug_eeprom=args.debug, wifi=args.wifi)
     # for
-    if not args.debug:
-        build(model, 260, debug_eeprom=True)
+    # if not args.debug:
+    #     build(model, 260, debug_eeprom=True)
     if not args.wifi:
         build(model, 260, debug_eeprom=False, wifi=True)
