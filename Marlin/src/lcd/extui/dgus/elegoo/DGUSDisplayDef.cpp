@@ -232,6 +232,11 @@
 
   inline void RTS_line_to_current(AxisEnum axis)
   {
+    #if ENABLED(PREVENT_COLD_EXTRUSION)
+      // RTS moves bypass the G-code parser, so PREVENT_COLD_EXTRUSION / EXTRUDE_MINTEMP
+      // never applies to them. Enforce it here for every E move issued by the display.
+      if (axis == E_AXIS && thermalManager.tooColdToExtrude(motion.extruder)) return;
+    #endif
     if (!planner.is_full())
     {
       planner.buffer_line(motion.position, MMM_TO_MMS(manual_feedrate_mm_m_[(int8_t)axis]), motion.extruder);
@@ -6298,11 +6303,14 @@
               //   #endif
               // }
 
-              motion.position.e -= Filament0LOAD;
               //active_extruder = 0;
               queue.enqueue_now_P(PSTR("T0"));
 
-              if(thermalManager.temp_hotend[0].celsius < (ChangeFilament0Temp - 5))
+              // Check for a cold nozzle BEFORE committing the move, using Marlin's own
+              // criteria (target and current temp vs EXTRUDE_MINTEMP) like menu_filament.cpp
+              // does. A nozzle cooled down after a pause/runout has target 0, so it counts
+              // as too cold and the unload is gated behind the warn2_filament heat prompt.
+              if(thermalManager.targetTooColdToExtrude(0) || thermalManager.tooColdToExtrude(0))
               {
                 RTS_SndData((int)ChangeFilament0Temp, CHANGE_FILAMENT0_TEMP_VP);
                 RTS_SndData(ExchangePageBase + 24, ExchangepageAddr);
@@ -6313,6 +6321,7 @@
               }
               else
               {
+                motion.position.e -= Filament0LOAD;
                 RTS_line_to_current(E_AXIS);
                 RTS_SndData(10 * Filament0LOAD, HEAD0_FILAMENT_LOAD_DATA_VP);
                 //planner.synchronize();
@@ -6349,11 +6358,11 @@
               //     }
               //   #endif
               // }
-              motion.position.e += Filament0LOAD;
               //active_extruder = 0;
               queue.enqueue_now_P(PSTR("T0"));
 
-              if(thermalManager.temp_hotend[0].celsius < (ChangeFilament0Temp - 5))
+              // Cold-nozzle gate before committing the load move - see the unload case above.
+              if(thermalManager.targetTooColdToExtrude(0) || thermalManager.tooColdToExtrude(0))
               {
                 RTS_SndData((int)ChangeFilament0Temp, CHANGE_FILAMENT0_TEMP_VP);
                 RTS_SndData(ExchangePageBase + 24, ExchangepageAddr);
@@ -6366,6 +6375,7 @@
               }
               else
               {
+                motion.position.e += Filament0LOAD;
                 RTS_line_to_current(E_AXIS);
                 RTS_SndData(10 * Filament0LOAD, HEAD0_FILAMENT_LOAD_DATA_VP);
                 planner.synchronize();
